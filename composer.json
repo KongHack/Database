@@ -1,0 +1,25 @@
+{
+  "repositories": [
+    {"type": "composer", "url": "http://toran.konghack.com/app.php/repo/private/"},
+    {"type": "composer", "url": "http://toran.konghack.com/app.php/repo/packagist/"},
+    {"packagist": false}
+  ],
+  "name": "gcworld/database",
+  "description": "GCWorld Industries Database",
+  "authors": [
+    {
+      "name": "GameCharmer",
+      "email": "admin@gamecharmer.com"
+    }
+  ],
+  "require": {
+    "gcworld/interfaces": ">=1.2",
+    "php": ">=5.4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "GCWorld\\Database\\": "src/"
+    }
+  },
+  "license":"GPL-3.0"
+}
