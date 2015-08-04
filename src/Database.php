@@ -71,6 +71,7 @@ class Database extends PDO
     }
 
     /**
+     * Note: This is injectible!  Use with caution!
      * @param string $table
      * @param string $comment
      */
