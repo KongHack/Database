@@ -77,10 +77,9 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function setTableComment($table, $comment)
     {
-        $sql = 'ALTER TABLE '.$table.' COMMENT = :comment';
-        $stmt = $this->query($sql);
-        $stmt->execute(array(':comment'=>$comment));
-        $stmt->closeCursor();
+        // Apparently this cannot be prepared.  Straight exec.
+        $sql = 'ALTER TABLE `'.$table.'` COMMENT = '.$this->quote($comment);
+        $this->exec($sql);
     }
 
     public function setDefaults()
