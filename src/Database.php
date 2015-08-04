@@ -79,7 +79,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     {
         $sql = 'ALTER TABLE '.$table.' COMMENT = :comment';
         $stmt = $this->query($sql);
-        $stmt->execute(array(':table'=>$table, ':comment'=>$comment));
+        $stmt->execute(array(':comment'=>$comment));
         $stmt->closeCursor();
     }
 
