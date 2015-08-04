@@ -4,7 +4,7 @@ namespace GCWorld\Database;
 use PDO;
 use PDOException;
 
-class Database extends PDO
+class Database extends PDO implements \GCWorld\Interfaces\Database
 {
 
     /**
