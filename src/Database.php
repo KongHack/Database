@@ -82,4 +82,11 @@ class Database extends PDO
         $stmt->execute(array(':table'=>$table, ':comment'=>$comment));
         $stmt->closeCursor();
     }
+
+    public function setDefaults()
+    {
+        $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $this->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    }
 }

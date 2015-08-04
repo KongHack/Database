@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "gcworld/interfaces",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.konghack.com/GCWorld/Interfaces.git",
-                "reference": "9c9c8359a239d0db08013ffdc3d72bf38464e355"
+                "reference": "be5b02c76f6d29abb1f2d4870456e63e33c761e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://toran.konghack.com/repo/private/dists/gcworld/interfaces/1.2.0.0/9c9c8359a239d0db08013ffdc3d72bf38464e355.zip",
-                "reference": "9c9c8359a239d0db08013ffdc3d72bf38464e355",
+                "url": "http://toran.konghack.com/repo/private/dists/gcworld/interfaces/1.2.1.0/be5b02c76f6d29abb1f2d4870456e63e33c761e2.zip",
+                "reference": "be5b02c76f6d29abb1f2d4870456e63e33c761e2",
                 "shasum": null,
                 "mirrors": [
                     {
@@ -45,7 +45,7 @@
                 }
             ],
             "description": "GCWorld Industries Interfaces",
-            "time": "2015-08-04 13:35:08"
+            "time": "2015-08-04 14:09:58"
         }
     ],
     "packages-dev": [],
