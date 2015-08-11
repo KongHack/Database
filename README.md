@@ -4,7 +4,7 @@ The GCWorld Database is a simple extension of PDO.  It adds a few functions used
 
 
 ### Version
-1.1.1.4
+1.1.1.5
 
 ### Additional Information
 
