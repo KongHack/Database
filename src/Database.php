@@ -33,7 +33,6 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
             return false;
         }
         $good = ($result !== false);
-        $result->closeCursor();
         return $good;
     }
 
