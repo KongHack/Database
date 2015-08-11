@@ -60,7 +60,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
                 FROM information_schema.TABLES
                 WHERE TABLE_NAME = :table
                 AND TABLE_SCHEMA = :schema';
-        $stmt = $this->query($sql);
+        $stmt = $this->prepare($sql);
         $stmt->execute(array(':table'=>$table, ':schema'=>$schema));
         $row = $stmt->fetch();
         $stmt->closeCursor();
