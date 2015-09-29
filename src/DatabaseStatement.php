@@ -25,7 +25,7 @@ class DatabaseStatement extends PDOStatement
     /**
      * @param array|null $input_parameters
      */
-    public function execute(array $input_parameters = null)
+    public function execute($input_parameters = null)
     {
         $start = 0;
         if ($this->debug) {
