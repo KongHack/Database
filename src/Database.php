@@ -86,5 +86,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         $this->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('\\GCWorld\\Database\\DatabaseStatement', array($this)));
     }
+
 }
