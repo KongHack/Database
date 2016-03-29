@@ -4,24 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c8516e7c7de11f068b2b409406285623",
+    "hash": "4a4b2965d1c739080349f8b3acad3e1d",
+    "content-hash": "589930cd596319c7f2362817572183e7",
     "packages": [
         {
             "name": "gcworld/interfaces",
-            "version": "1.2.1",
+            "version": "2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.konghack.com/GCWorld/Interfaces.git",
-                "reference": "be5b02c76f6d29abb1f2d4870456e63e33c761e2"
+                "reference": "4ae7124a15367e945dc9020374db9aaa975db4c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://toran.konghack.com/repo/private/dists/gcworld/interfaces/1.2.1.0/be5b02c76f6d29abb1f2d4870456e63e33c761e2.zip",
-                "reference": "be5b02c76f6d29abb1f2d4870456e63e33c761e2",
+                "url": "http://toran.konghack.com/repo/private/dists/gcworld/interfaces/2.0.6.0/4ae7124a15367e945dc9020374db9aaa975db4c2.zip",
+                "reference": "4ae7124a15367e945dc9020374db9aaa975db4c2",
                 "shasum": null,
                 "mirrors": [
                     {
-                        "url": "http://toran.konghack.com/repo/private/dists/%package%/%version%/%reference%.%type%",
+                        "url": "https://toran.konghack.com/repo/private/dists/%package%/%version%/%reference%.%type%",
                         "preferred": true
                     }
                 ]
@@ -45,7 +46,7 @@
                 }
             ],
             "description": "GCWorld Industries Interfaces",
-            "time": "2015-08-04 14:09:58"
+            "time": "2015-08-10 15:04:19"
         }
     ],
     "packages-dev": [],
