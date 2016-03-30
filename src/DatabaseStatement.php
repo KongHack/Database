@@ -6,6 +6,7 @@ use PDOStatement;
 class DatabaseStatement extends PDOStatement
 {
     private $debug = false;
+    /** @var Database */
     private $dbh   = null;
 
     protected function __construct($dbh)
@@ -23,7 +24,9 @@ class DatabaseStatement extends PDOStatement
     }
 
     /**
-     * @param array|null $input_parameters
+     * @param null|array $input_parameters
+     * @return array|bool
+     * @throws \Exception
      */
     public function execute($input_parameters = null)
     {
@@ -32,10 +35,25 @@ class DatabaseStatement extends PDOStatement
             $start = microtime(true);
         }
 
-        if (is_array($input_parameters)) {
-            $result = parent::execute($input_parameters);
-        }else {
-            $result = parent::execute();
+
+        try{
+            if (is_array($input_parameters)) {
+                $result = parent::execute($input_parameters);
+            } else {
+                $result = parent::execute();
+            }
+        } catch (\Exception $e) {
+            $msg = $e->getMessage();
+           if(strstr($msg, 'MySQL server has gone away')) {
+                $this->dbh->reconnect();
+                if (is_array($input_parameters)) {
+                    $result = parent::execute($input_parameters);
+                } else {
+                    $result = parent::execute();
+                }
+            } else {
+                throw $e;
+            }
         }
 
         if ($this->debug) {
