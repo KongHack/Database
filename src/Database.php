@@ -7,20 +7,22 @@ use PDOException;
 class Database extends PDO implements \GCWorld\Interfaces\Database
 {
     private $connection_details = [];
+    private $deadlock_retries   = 0;
+    private $deadlock_usleep    = 1000;
 
     /**
      * Database constructor.
      * @param string $dsn
      * @param string $username
      * @param string $passwd
-     * @param array $options
+     * @param array  $options
      */
     public function __construct($dsn, $username, $passwd, $options)
     {
-        $this->connection_details['dsn'] = $dsn;
+        $this->connection_details['dsn']      = $dsn;
         $this->connection_details['username'] = $username;
-        $this->connection_details['passwd'] = $passwd;
-        $this->connection_details['options'] = $options;
+        $this->connection_details['passwd']   = $passwd;
+        $this->connection_details['options']  = $options;
 
         parent::__construct($dsn, $username, $passwd, $options);
     }
@@ -30,11 +32,12 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function ping()
     {
-        try {
+        try{
             $this->query('SELECT 1');
-        } catch (PDOException $e) {
+        } catch(PDOException $e){
             return false;
         }
+
         return true;
     }
 
@@ -45,12 +48,13 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function tableExists($table)
     {
-        try {
+        try{
             $result = $this->query('SELECT 1 FROM '.$table.' LIMIT 1');
-        } catch (PDOException $e) {
+        } catch(PDOException $e){
             return false;
         }
         $good = ($result !== false);
+
         return $good;
     }
 
@@ -62,6 +66,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         $stmt = $this->query('select database()');
         $name = $stmt->fetchColumn();
         $stmt->closeCursor();
+
         return $name;
     }
 
@@ -73,17 +78,18 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     {
         $schema = $this->getWorkingDatabaseName();
 
-        $sql = 'SELECT TABLE_COMMENT AS comment
+        $sql  = 'SELECT TABLE_COMMENT AS comment
                 FROM information_schema.TABLES
                 WHERE TABLE_NAME = :table
                 AND TABLE_SCHEMA = :schema';
         $stmt = $this->prepare($sql);
-        $stmt->execute(array(':table'=>$table, ':schema'=>$schema));
+        $stmt->execute(array(':table' => $table, ':schema' => $schema));
         $row = $stmt->fetch();
         $stmt->closeCursor();
         if (is_array($row)) {
             return $row['comment'];
         }
+
         return false;
     }
 
@@ -115,21 +121,41 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function prepare($statement, $driver_options = null)
     {
-        if($driver_options == null) {
+        $return  = null;    // Oh boy!
+        $done    = false;
+        $retries = 0;
+
+        if ($driver_options == null) {
             $driver_options = [];
         }
 
-        try {
-            $return = parent::prepare($statement, $driver_options);
-        } catch (\Exception $e) {
-            $msg = $e->getMessage();
-            if(strstr($msg, 'MySQL server has gone away')) {
-                $this->reconnect();
+        while (!$done) {
+            try{
                 $return = parent::prepare($statement, $driver_options);
-            } else {
-                throw $e;
+                $done   = true;
+
+            } catch(\Exception $e){
+                $msg = $e->getMessage();
+                if (stristr($msg, 'deadlock')) {
+                    if ($retries < $this->deadlock_retries) {
+                        usleep($this->deadlock_usleep);
+                        $done = false;
+                        ++$retries;
+                    } else {
+                        $done = true;
+                        throw $e;
+                    }
+                } elseif (stristr($msg, 'MySQL server has gone away')) {
+                    $this->reconnect();
+                    $done   = true;
+                    $return = parent::prepare($statement, $driver_options);
+                } else {
+                    $done = true;
+                    throw $e;
+                }
             }
         }
+
         return $return;
     }
 
@@ -141,4 +167,35 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
             $this->connection_details['options']);
     }
 
+    /**
+     * @param int $retries
+     */
+    public function setDeadlockRetries($retries = 0)
+    {
+        $this->deadlock_retries = $retries;
+    }
+
+    /**
+     * @param int $usleep_time
+     */
+    public function setDeadlockUSleep($usleep_time = 1000)
+    {
+        $this->deadlock_usleep = $usleep_time;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDeadlockRetries()
+    {
+        return $this->deadlock_retries;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDeadlockUSleep()
+    {
+        return $this->deadlock_usleep;
+    }
 }
