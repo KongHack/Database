@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4a4b2965d1c739080349f8b3acad3e1d",
-    "content-hash": "589930cd596319c7f2362817572183e7",
+    "hash": "6b66a5743d356b428cfc0b619bc51119",
+    "content-hash": "399fdc0fec223f0bb26d838976700851",
     "packages": [
         {
             "name": "gcworld/interfaces",

@@ -1,9 +1,4 @@
 {
-  "repositories": [
-    {"type": "composer", "url": "https://toran.konghack.com/app.php/repo/private/"},
-    {"type": "composer", "url": "https://toran.konghack.com/app.php/repo/packagist/"},
-    {"packagist": false}
-  ],
   "name": "gcworld/database",
   "description": "GCWorld Industries Database",
   "authors": [
