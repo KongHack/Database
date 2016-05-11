@@ -50,7 +50,7 @@ class Controller
             }
 
             if (!array_key_exists($instanceName, self::$config)) {
-                throw new \Exception('Requested instance does not exist in config');
+                throw new \Exception('Requested instance "'.$instanceName.'" does not exist in config');
             }
 
             $instance                       = new self(self::$config[$instanceName]);

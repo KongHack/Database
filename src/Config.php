@@ -17,7 +17,7 @@ class Config
         if (!file_exists($file)) {
             throw new Exception('Config File Not Found');
         }
-        $config = parse_ini_file($file);
+        $config = parse_ini_file($file, true);
         if (isset($config['config_path'])) {
             $file   = $config['config_path'];
             $config = parse_ini_file($file);
