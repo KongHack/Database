@@ -9,12 +9,19 @@
   ],
   "require": {
     "gcworld/interfaces": ">=1.2",
-    "php": ">=5.4.0"
+    "php": ">=5.6",
+    "composer/composer": "1.0.*@dev",
+    "composer/installers": "1.0.*@dev"
   },
   "autoload": {
     "psr-4": {
       "GCWorld\\Database\\": "src/"
     }
+  },
+  "scripts": {
+    "post-autoload-dump": [
+      "GCWorld\\Database\\ComposerInstaller::setupConfig"
+    ]
   },
   "license":"GPL-3.0"
 }

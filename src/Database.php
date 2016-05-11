@@ -9,6 +9,9 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     private $connection_details = [];
     private $deadlock_retries   = 0;
     private $deadlock_usleep    = 1000;
+    /** @var Controller|null */
+    private $controller         = null;
+    private $controller_id      = null;
 
     /**
      * Database constructor.
@@ -25,6 +28,24 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         $this->connection_details['options']  = $options;
 
         parent::__construct($dsn, $username, $passwd, $options);
+    }
+
+    /**
+     * @param \GCWorld\Database\Controller $controller
+     * @param string $id
+     */
+    public function attachController(Controller $controller, $id)
+    {
+        $this->controller = $controller;
+        $this->controller_id = $id;
+    }
+
+    /**
+     * @return null|Controller
+     */
+    public function getController()
+    {
+        return $this->controller;
     }
 
     /**
@@ -121,6 +142,24 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function prepare($statement, $driver_options = null)
     {
+        if($this->controller != null) {
+            if($this->controller->getMode() == Controller::MODE_SPLIT) {
+                // Check the statement
+                $token = strtoupper(substr(trim($statement),0,6));
+                if($token == 'SELECT') {                                        // If we are reading...
+                    if($this->controller_id != Controller::IDENTIFIER_READ) {   // But this isn't the read db
+                        return $this->controller->getDatabase(Controller::IDENTIFIER_READ)
+                            ->prepare($statement, $driver_options);
+                    }
+                } else {                                                        // If we are writing...
+                    if($this->controller_id != Controller::IDENTIFIER_WRITE) {  // But this isn't the write db
+                        return $this->controller->getDatabase(Controller::IDENTIFIER_WRITE)
+                            ->prepare($statement, $driver_options);
+                    }
+                }
+            }
+        }
+
         $return  = null;    // Oh boy!
         $done    = false;
         $retries = 0;
