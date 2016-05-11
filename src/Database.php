@@ -237,4 +237,24 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     {
         return $this->deadlock_usleep;
     }
+
+    /**
+     * @param null $name
+     * @return string
+     * @throws \Exception
+     */
+    public function lastInsertId($name = null)
+    {
+        if ($this->controller != null) {
+            if ($this->controller->getMode() == Controller::MODE_SPLIT) {
+                if ($this->controller_id != Controller::IDENTIFIER_WRITE) {
+                    return $this->controller->getDatabase(Controller::IDENTIFIER_WRITE)->lastInsertId();
+                }
+            }
+        }
+
+        return parent::lastInsertId($name);
+    }
+
+
 }
