@@ -5,7 +5,7 @@ use Composer\Script\Event;
 
 class ComposerInstaller
 {
-    const CONFIG_FILE_NAME = 'GC_Database.ini';
+    const CONFIG_FILE_NAME = 'GCWorld_Database.ini';
 
     static function setupConfig(Event $event)
     {
