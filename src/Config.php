@@ -22,7 +22,7 @@ class Config
             $file   = $config['config_path'];
             $config = parse_ini_file($file);
         }
-        if (!isset($config['api_key'])) {
+        if (!isset($config['common'])) {
             throw new Exception('Config does not contain "common" value!');
         }
 
