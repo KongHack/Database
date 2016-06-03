@@ -144,17 +144,24 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     {
         if($this->controller != null) {
             if($this->controller->getMode() == Controller::MODE_SPLIT) {
-                // Check the statement
-                $token = strtoupper(substr(trim($statement),0,6));
-                if($token == 'SELECT') {                                        // If we are reading...
-                    if($this->controller_id != Controller::IDENTIFIER_READ) {   // But this isn't the read db
-                        return $this->controller->getDatabase(Controller::IDENTIFIER_READ)
-                            ->prepare($statement, $driver_options);
-                    }
-                } else {                                                        // If we are writing...
-                    if($this->controller_id != Controller::IDENTIFIER_WRITE) {  // But this isn't the write db
+                if($this->controller->isWriteLocked()) {
+                    if($this->controller_id != Controller::IDENTIFIER_WRITE) {
                         return $this->controller->getDatabase(Controller::IDENTIFIER_WRITE)
                             ->prepare($statement, $driver_options);
+                    }
+                } else {
+                    // Check the statement
+                    $token = strtoupper(substr(trim($statement), 0, 6));
+                    if ($token == 'SELECT') {                                        // If we are reading...
+                        if ($this->controller_id != Controller::IDENTIFIER_READ) {   // But this isn't the read db
+                            return $this->controller->getDatabase(Controller::IDENTIFIER_READ)
+                                ->prepare($statement, $driver_options);
+                        }
+                    } else {                                                        // If we are writing...
+                        if ($this->controller_id != Controller::IDENTIFIER_WRITE) {  // But this isn't the write db
+                            return $this->controller->getDatabase(Controller::IDENTIFIER_WRITE)
+                                ->prepare($statement, $driver_options);
+                        }
                     }
                 }
             }

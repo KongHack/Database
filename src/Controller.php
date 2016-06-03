@@ -23,6 +23,7 @@ class Controller
 
     protected $mode      = 0;
     protected $databases = [];
+    protected $writeLockLevel = 0;
 
     /**
      * @param $instanceName
@@ -130,7 +131,7 @@ class Controller
 
     /**
      * @param $key
-     * @return Database
+     * @return mixed
      * @throws \Exception
      */
     public function getDatabase($key)
@@ -140,4 +141,31 @@ class Controller
         }
         throw new \Exception('Invalid Key Passed');
     }
+
+    /**
+     * @return $this
+     */
+    public function startWriteLock()
+    {
+        $this->writeLockLevel++;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function endWriteLock()
+    {
+        $this->writeLockLevel--;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWriteLocked()
+    {
+        return ($this->writeLockLevel > 0);
+    }
+
 }
