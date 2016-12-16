@@ -6,12 +6,19 @@ use PDOException;
 
 class Database extends PDO implements \GCWorld\Interfaces\Database
 {
+    const DEBUG_OFF = 0;
+    const DEBUG_BASIC = 1;
+    const DEBUG_ADVANCED = 2;
+
+
     private $connection_details = [];
     private $deadlock_retries   = 0;
     private $deadlock_usleep    = 1000;
     /** @var Controller|null */
-    private $controller         = null;
-    private $controller_id      = null;
+    private $controller    = null;
+    private $controller_id = null;
+    private $debugLevel    = 0;
+    private $debugTiming   = [];
 
     /**
      * Database constructor.
@@ -32,11 +39,11 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
 
     /**
      * @param \GCWorld\Database\Controller $controller
-     * @param string $id
+     * @param string                       $id
      */
     public function attachController(Controller $controller, $id)
     {
-        $this->controller = $controller;
+        $this->controller    = $controller;
         $this->controller_id = $id;
     }
 
@@ -126,12 +133,17 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         $this->exec($sql);
     }
 
+    /**
+     * @return $this
+     */
     public function setDefaults()
     {
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         $this->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('\\GCWorld\\Database\\DatabaseStatement', array($this)));
+        $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, ['\\GCWorld\\Database\\DatabaseStatement', [$this]]);
+
+        return $this;
     }
 
     /**
@@ -142,10 +154,10 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function prepare($statement, $driver_options = null)
     {
-        if($this->controller != null) {
-            if($this->controller->getMode() == Controller::MODE_SPLIT) {
-                if($this->controller->isWriteLocked()) {
-                    if($this->controller_id != Controller::IDENTIFIER_WRITE) {
+        if ($this->controller != null) {
+            if ($this->controller->getMode() == Controller::MODE_SPLIT) {
+                if ($this->controller->isWriteLocked()) {
+                    if ($this->controller_id != Controller::IDENTIFIER_WRITE) {
                         return $this->controller->getDatabase(Controller::IDENTIFIER_WRITE)
                             ->prepare($statement, $driver_options);
                     }
@@ -263,5 +275,53 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         return parent::lastInsertId($name);
     }
 
+    /**
+     * @param int $level
+     * @return $this
+     */
+    public function setDebugLevel($level = self::DEBUG_OFF)
+    {
+        $this->debugLevel = $level;
 
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDebugLevel()
+    {
+        return $this->debugLevel;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDebugTiming()
+    {
+        return $this->debugTiming;
+    }
+
+    /**
+     * @param $query
+     * @param $params
+     * @param $time
+     * @return bool
+     */
+    public function addDebugTimingEntry($query, $params, $time)
+    {
+        $hash = md5($query);
+        $this->debugTiming[$hash] = [
+            'query' => $query,
+            'times' => [],
+        ];
+
+        $this->debugTiming[$hash]['times'][] = [
+            'params' => $params,
+            'time'   => $time,
+        ];
+
+        return true;
+
+    }
 }

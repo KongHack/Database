@@ -5,22 +5,23 @@ use PDOStatement;
 
 class DatabaseStatement extends PDOStatement
 {
-    private $debug = false;
+    private $debugLevel = 0;
     /** @var Database */
     private $dbh = null;
 
     protected function __construct($dbh)
     {
         $this->dbh = $dbh;
+        $this->setDebuggingLevel($this->dbh->getDebugLevel());
     }
 
 
     /**
      * @param bool|true $bool
      */
-    public function enableDebugging($bool = true)
+    public function setDebuggingLevel($level)
     {
-        $this->debug = $bool;
+        $this->debugLevel = $level;
     }
 
     /**
@@ -35,7 +36,9 @@ class DatabaseStatement extends PDOStatement
         $retries = 0;
 
         $start = 0;
-        if ($this->debug) {
+        $end   = 0;
+
+        if ($this->debugLevel >= Database::DEBUG_BASIC) {
             $start = microtime(true);
         }
 
@@ -75,9 +78,12 @@ class DatabaseStatement extends PDOStatement
             }
         }
 
-        if ($this->debug) {
+        if ($this->debugLevel >= Database::DEBUG_BASIC) {
             $end = microtime(true);
+            $this->dbh->addDebugTimingEntry($this->queryString, $input_parameters, ($end - $start));
+        }
 
+        if ($this->debugLevel >= Database::DEBUG_ADVANCED) {
             return array('result' => $result, 'time' => ($end - $start));
         }
 
