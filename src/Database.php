@@ -194,7 +194,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
 
             } catch(\Exception $e){
                 $msg = $e->getMessage();
-                if (stristr($msg, 'deadlock')) {
+                if (stristr($msg, 'deadlock') !== false) {
                     if ($retries < $this->deadlock_retries) {
                         usleep($this->deadlock_usleep);
                         $done = false;
@@ -203,12 +203,11 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
                         $done = true;
                         throw $e;
                     }
-                } elseif (stristr($msg, 'MySQL server has gone away')) {
+                } elseif (stristr($msg, 'has gone away') !== false) {
                     $this->reconnect();
                     $done   = true;
                     $return = parent::prepare($statement, $driver_options);
                 } else {
-                    $done = true;
                     throw $e;
                 }
             }

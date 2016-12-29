@@ -62,7 +62,7 @@ class DatabaseStatement extends PDOStatement
                         $done = true;
                         throw $e;
                     }
-                } elseif (stristr($msg, 'MySQL server has gone away')) {
+                } elseif (stristr($msg, 'server has gone away') !== false) {
                     $this->dbh->reconnect();
                     if (is_array($input_parameters)) {
                         $result = parent::execute($input_parameters);

@@ -64,6 +64,7 @@ class Controller
     /**
      * Controller constructor.
      * @param array $config
+     * @throws \Exception
      */
     private function __construct(array $config)
     {
