@@ -323,4 +323,36 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         return true;
 
     }
+
+    /**
+     *
+     */
+    public function startWriteLockSafely()
+    {
+        if($this->getController() !== null) {
+            $this->getController()->startWriteLock();
+        }
+    }
+
+    /**
+     *
+     */
+    public function endWriteLockSafely()
+    {
+        if($this->getController() !== null) {
+            $this->getController()->endWriteLock();
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWriteLocked()
+    {
+        if($this->getController() !== null) {
+            return $this->getController()->isWriteLocked();
+        }
+        return false;
+    }
+
 }
