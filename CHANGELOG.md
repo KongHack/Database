@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.2.0](https://gitlab.konghack.com/GCWorld/Database/compare/2.1.2...2.2.0)
+ - @GameCharmer disconnect method for the controller
+
+
 ## [2.1.2](https://gitlab.konghack.com/GCWorld/Database/compare/2.1.1...2.1.2)
  - @GameCharmer add safe write lock testing functions to the database class.
 

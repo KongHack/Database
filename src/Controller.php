@@ -21,8 +21,8 @@ class Controller
     /** @var Common */
     private static $common = null;
 
-    protected $mode      = 0;
-    protected $databases = [];
+    protected $mode           = 0;
+    protected $databases      = [];
     protected $writeLockLevel = 0;
 
     /**
@@ -149,6 +149,7 @@ class Controller
     public function startWriteLock()
     {
         $this->writeLockLevel++;
+
         return $this;
     }
 
@@ -158,6 +159,7 @@ class Controller
     public function endWriteLock()
     {
         $this->writeLockLevel--;
+
         return $this;
     }
 
@@ -169,4 +171,30 @@ class Controller
         return ($this->writeLockLevel > 0);
     }
 
+
+    public function disconnectAll()
+    {
+        foreach ($this->databases as $identifier => $pdo) {
+            /** @var Database $pdo */
+
+            $query = 'SHOW PROCESSLIST -- '.uniqid('pdo_mysql_close ', 1);
+            try{
+                $list = $pdo->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+            } catch(\PDOException $e){
+                unset($this->databases[$identifier]);
+
+                continue;
+            }
+            foreach ($list as $thread) {
+                if ($thread['Info'] === $query) {
+                    unset($this->databases[$identifier]);
+                    try{
+                        $pdo->query('KILL '.$thread['Id']);
+                    } catch(\PDOException $e){
+                        continue;
+                    }
+                }
+            }
+        }
+    }
 }
