@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.2.1](https://gitlab.konghack.com/GCWorld/Database/compare/2.2.0...2.2.1)
+ - @GameCharmer improved disconnect method!
+
+
 ## [2.2.0](https://gitlab.konghack.com/GCWorld/Database/compare/2.1.2...2.2.0)
  - @GameCharmer disconnect method for the controller
 

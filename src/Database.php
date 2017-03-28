@@ -309,7 +309,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function addDebugTimingEntry($query, $params, $time)
     {
-        $hash = md5($query);
+        $hash                     = md5($query);
         $this->debugTiming[$hash] = [
             'query' => $query,
             'times' => [],
@@ -329,7 +329,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function startWriteLockSafely()
     {
-        if($this->getController() !== null) {
+        if ($this->getController() !== null) {
             $this->getController()->startWriteLock();
         }
     }
@@ -339,7 +339,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function endWriteLockSafely()
     {
-        if($this->getController() !== null) {
+        if ($this->getController() !== null) {
             $this->getController()->endWriteLock();
         }
     }
@@ -349,10 +349,34 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function isWriteLocked()
     {
-        if($this->getController() !== null) {
+        if ($this->getController() !== null) {
             return $this->getController()->isWriteLocked();
         }
+
         return false;
     }
 
+    /**
+     * @return bool
+     */
+    public function disconnect()
+    {
+        $query = 'SHOW PROCESSLIST -- '.uniqid('pdo_mysql_close ', 1);
+        try{
+            $list = $this->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+        } catch(\PDOException $e){
+            return true;
+        }
+        foreach ($list as $thread) {
+            if ($thread['Info'] === $query) {
+                try{
+                    $this->query('KILL '.$thread['Id']);
+                } catch(\PDOException $e){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }
