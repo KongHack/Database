@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.2.2](https://gitlab.konghack.com/GCWorld/Database/compare/2.2.1...2.2.2)
+ - @GameCharmer switched some stristr to stripos
+ - @GameCharmer switched driver_options over to matching PDO declaration
+ - @GameCharmer added @var notes for resolution
+
+
 ## [2.2.1](https://gitlab.konghack.com/GCWorld/Database/compare/2.2.0...2.2.1)
  - @GameCharmer improved disconnect method!
 
