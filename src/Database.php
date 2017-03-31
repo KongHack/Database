@@ -111,7 +111,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
                 WHERE TABLE_NAME = :table
                 AND TABLE_SCHEMA = :schema';
         $stmt = $this->prepare($sql);
-        $stmt->execute(array(':table' => $table, ':schema' => $schema));
+        $stmt->execute([':table' => $table, ':schema' => $schema]);
         $row = $stmt->fetch();
         $stmt->closeCursor();
         if (is_array($row)) {
@@ -152,7 +152,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      * @return DatabaseStatement
      * @throws \Exception
      */
-    public function prepare($statement, $driver_options = null)
+    public function prepare($statement, array $driver_options = array())
     {
         if ($this->controller != null) {
             if ($this->controller->getMode() == Controller::MODE_SPLIT) {
@@ -179,33 +179,30 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
             }
         }
 
-        $return  = null;    // Oh boy!
+        $return  = null;
         $done    = false;
         $retries = 0;
 
-        if ($driver_options == null) {
-            $driver_options = [];
-        }
-
         while (!$done) {
             try{
+                /** @var DatabaseStatement $return */
                 $return = parent::prepare($statement, $driver_options);
                 $done   = true;
 
             } catch(\Exception $e){
                 $msg = $e->getMessage();
-                if (stristr($msg, 'deadlock') !== false) {
+                if (stripos($msg, 'deadlock') !== false) {
                     if ($retries < $this->deadlock_retries) {
                         usleep($this->deadlock_usleep);
                         $done = false;
                         ++$retries;
                     } else {
-                        $done = true;
                         throw $e;
                     }
-                } elseif (stristr($msg, 'has gone away') !== false) {
+                } elseif (stripos($msg, 'has gone away') !== false) {
                     $this->reconnect();
                     $done   = true;
+                    /** @var DatabaseStatement $return */
                     $return = parent::prepare($statement, $driver_options);
                 } else {
                     throw $e;
