@@ -152,7 +152,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      * @return DatabaseStatement
      * @throws \Exception
      */
-    public function prepare($statement, array $driver_options = array())
+    public function prepare($statement, $driver_options = null)
     {
         if ($this->controller != null) {
             if ($this->controller->getMode() == Controller::MODE_SPLIT) {
@@ -178,6 +178,11 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
                 }
             }
         }
+
+        if($driver_options == null) {
+            $driver_options = [];
+        }
+
 
         $return  = null;
         $done    = false;
