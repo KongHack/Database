@@ -3,23 +3,31 @@ namespace GCWorld\Database;
 
 use PDOStatement;
 
+/**
+ * Class DatabaseStatement
+ * @package GCWorld\Database
+ */
 class DatabaseStatement extends PDOStatement
 {
     private $debugLevel = 0;
     /** @var Database */
     private $dbh = null;
 
-    protected function __construct($dbh)
+    /**
+     * DatabaseStatement constructor.
+     * @param \GCWorld\Database\Database $dbh
+     */
+    protected function __construct(Database $dbh)
     {
         $this->dbh = $dbh;
         $this->setDebuggingLevel($this->dbh->getDebugLevel());
     }
 
-
     /**
-     * @param bool|true $bool
+     * @param int $level
+     * @return void
      */
-    public function setDebuggingLevel($level)
+    public function setDebuggingLevel(int $level)
     {
         $this->debugLevel = $level;
     }
@@ -43,7 +51,7 @@ class DatabaseStatement extends PDOStatement
         }
 
         while (!$done) {
-            try{
+            try {
                 if (is_array($input_parameters)) {
                     $result = parent::execute($input_parameters);
                     $done   = true;
@@ -51,7 +59,7 @@ class DatabaseStatement extends PDOStatement
                     $result = parent::execute();
                     $done   = true;
                 }
-            } catch(\Exception $e){
+            } catch (\Exception $e) {
                 $msg = $e->getMessage();
                 if (stristr($msg, 'deadlock')) {
                     if ($retries < $this->dbh->getDeadlockRetries()) {

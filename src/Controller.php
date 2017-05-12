@@ -10,11 +10,11 @@ use GCWorld\Interfaces\Common;
 class Controller
 {
     const MODE_SINGLE = 1;
-    const MODE_SPLIT = 2;
+    const MODE_SPLIT  = 2;
 
-    const IDENTIFIER_READ = 'R';
+    const IDENTIFIER_READ  = 'R';
     const IDENTIFIER_WRITE = 'W';
-    const IDENTIFIER_BOTH = 'B';
+    const IDENTIFIER_BOTH  = 'B';
 
     private static $instances = [];
     private static $config    = null;
@@ -26,14 +26,13 @@ class Controller
     protected $writeLockLevel = 0;
 
     /**
-     * @param $instanceName
+     * @param string $instanceName
      * @return self
      * @throws \Exception
      */
-    public static function getInstance($instanceName)
+    public static function getInstance(string $instanceName)
     {
         if (!array_key_exists($instanceName, self::$instances)) {
-
             if (self::$config == null) {
                 $cConfig      = new Config();
                 self::$config = $cConfig->getConfig();
@@ -83,12 +82,16 @@ class Controller
             $dsn = 'mysql:host='.$databaseArray['host'].';dbname='.$databaseArray['name'].
                 (isset($databaseArray['port']) ? ';port='.$databaseArray['port'] : '');
 
-            $db = new Database($dsn, $databaseArray['user'], $databaseArray['pass'],
-                [Database::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']);
-            $db->setDefaults();
+            $database = new Database(
+                $dsn,
+                $databaseArray['user'],
+                $databaseArray['pass'],
+                [Database::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
+            );
+            $database->setDefaults();
             // Do not attach the controller, since single mode will act as a passthru
-            $this->databases[self::IDENTIFIER_READ]  = $db;
-            $this->databases[self::IDENTIFIER_WRITE] = $db;
+            $this->databases[self::IDENTIFIER_READ]  = $database;
+            $this->databases[self::IDENTIFIER_WRITE] = $database;
         } else {
             $this->mode = self::MODE_SPLIT;
             $key        = $config['read'];
@@ -97,29 +100,36 @@ class Controller
                 throw new \Exception('Database definition not found in primary config!');
             }
 
-            $dbArray = $databases[$key];
-            $dsn     = 'mysql:host='.$dbArray['host'].';dbname='.$dbArray['name'].
+            $dbArray  = $databases[$key];
+            $dsn      = 'mysql:host='.$dbArray['host'].';dbname='.$dbArray['name'].
                 (isset($dbArray['port']) ? ';port='.$dbArray['port'] : '');
-            $db      = new Database($dsn, $dbArray['user'], $dbArray['pass'],
-                [Database::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']);
-            $db->setDefaults();
-            $db->attachController($this, self::IDENTIFIER_READ);
-            $this->databases[self::IDENTIFIER_READ] = $db;
+            $database = new Database(
+                $dsn,
+                $dbArray['user'],
+                $dbArray['pass'],
+                [Database::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
+            );
+            $database->setDefaults();
+            $database->attachController($this, self::IDENTIFIER_READ);
+            $this->databases[self::IDENTIFIER_READ] = $database;
 
 
             $key = $config['write'];
             if (!array_key_exists($key, $databases)) {
                 throw new \Exception('Database definition not found in primary config!');
             }
-            $dbArray = $databases[$key];
-            $dsn     = 'mysql:host='.$dbArray['host'].';dbname='.$dbArray['name'].(isset($dbArray['port']) ? ';port='.$dbArray['port'] : '');
-            $db      = new Database($dsn, $dbArray['user'], $dbArray['pass'],
-                [Database::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']);
-            $db->setDefaults();
-            $db->attachController($this, self::IDENTIFIER_WRITE);
-            $this->databases[self::IDENTIFIER_WRITE] = $db;
+            $dbArray  = $databases[$key];
+            $dsn      = 'mysql:host='.$dbArray['host'].';dbname='.$dbArray['name'].(isset($dbArray['port']) ? ';port='.$dbArray['port'] : '');
+            $database = new Database(
+                $dsn,
+                $dbArray['user'],
+                $dbArray['pass'],
+                [Database::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
+            );
+            $database->setDefaults();
+            $database->attachController($this, self::IDENTIFIER_WRITE);
+            $this->databases[self::IDENTIFIER_WRITE] = $database;
         }
-
     }
 
     /**
@@ -131,11 +141,11 @@ class Controller
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @return mixed
      * @throws \Exception
      */
-    public function getDatabase($key)
+    public function getDatabase(string $key)
     {
         if (array_key_exists($key, $this->databases)) {
             return $this->databases[$key];
@@ -179,7 +189,7 @@ class Controller
         foreach ($this->databases as $identifier => $pdo) {
             /** @var Database $pdo */
 
-            if($pdo->disconnect()) {
+            if ($pdo->disconnect()) {
                 unset($this->databases[$identifier]);
             }
         }

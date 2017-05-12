@@ -4,10 +4,14 @@ namespace GCWorld\Database;
 use PDO;
 use PDOException;
 
+/**
+ * Class Database
+ * @package GCWorld\Database
+ */
 class Database extends PDO implements \GCWorld\Interfaces\Database
 {
-    const DEBUG_OFF = 0;
-    const DEBUG_BASIC = 1;
+    const DEBUG_OFF      = 0;
+    const DEBUG_BASIC    = 1;
     const DEBUG_ADVANCED = 2;
 
 
@@ -27,7 +31,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      * @param string $passwd
      * @param array  $options
      */
-    public function __construct($dsn, $username, $passwd, $options)
+    public function __construct(string $dsn, string $username, string $passwd, array $options = [])
     {
         $this->connection_details['dsn']      = $dsn;
         $this->connection_details['username'] = $username;
@@ -39,12 +43,15 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
 
     /**
      * @param \GCWorld\Database\Controller $controller
-     * @param string                       $id
+     * @param string                       $identifier
+     * @return $this
      */
-    public function attachController(Controller $controller, $id)
+    public function attachController(Controller $controller, string $identifier)
     {
         $this->controller    = $controller;
-        $this->controller_id = $id;
+        $this->controller_id = $identifier;
+
+        return $this;
     }
 
     /**
@@ -60,9 +67,9 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function ping()
     {
-        try{
+        try {
             $this->query('SELECT 1');
-        } catch(PDOException $e){
+        } catch (PDOException $e) {
             return false;
         }
 
@@ -74,11 +81,11 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      * @param string $table
      * @return bool
      */
-    public function tableExists($table)
+    public function tableExists(string $table)
     {
-        try{
+        try {
             $result = $this->query('SELECT 1 FROM '.$table.' LIMIT 1');
-        } catch(PDOException $e){
+        } catch (PDOException $e) {
             return false;
         }
         $good = ($result !== false);
@@ -102,7 +109,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      * @param string $table
      * @return bool|string
      */
-    public function getTableComment($table)
+    public function getTableComment(string $table)
     {
         $schema = $this->getWorkingDatabaseName();
 
@@ -125,12 +132,15 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      * Note: This is injectible!  Use with caution!
      * @param string $table
      * @param string $comment
+     * @return $this
      */
-    public function setTableComment($table, $comment)
+    public function setTableComment(string $table, string $comment)
     {
         // Apparently this cannot be prepared.  Straight exec.
         $sql = 'ALTER TABLE `'.$table.'` COMMENT = '.$this->quote($comment);
         $this->exec($sql);
+
+        return $this;
     }
 
     /**
@@ -147,8 +157,8 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     }
 
     /**
-     * @param string $statement
-     * @param array  $driver_options
+     * @param mixed $statement
+     * @param mixed $driver_options
      * @return DatabaseStatement
      * @throws \Exception
      */
@@ -179,7 +189,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
             }
         }
 
-        if($driver_options == null) {
+        if ($driver_options == null) {
             $driver_options = [];
         }
 
@@ -189,12 +199,11 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         $retries = 0;
 
         while (!$done) {
-            try{
+            try {
                 /** @var DatabaseStatement $return */
                 $return = parent::prepare($statement, $driver_options);
                 $done   = true;
-
-            } catch(\Exception $e){
+            } catch (\Exception $e) {
                 $msg = $e->getMessage();
                 if (stripos($msg, 'deadlock') !== false) {
                     if ($retries < $this->deadlock_retries) {
@@ -206,7 +215,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
                     }
                 } elseif (stripos($msg, 'has gone away') !== false) {
                     $this->reconnect();
-                    $done   = true;
+                    $done = true;
                     /** @var DatabaseStatement $return */
                     $return = parent::prepare($statement, $driver_options);
                 } else {
@@ -218,26 +227,34 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         return $return;
     }
 
+    /**
+     * Attempts to reconnect to the DB
+     * @return void
+     */
     public function reconnect()
     {
-        $this->__construct($this->connection_details['dsn'],
+        $this->__construct(
+            $this->connection_details['dsn'],
             $this->connection_details['username'],
             $this->connection_details['passwd'],
-            $this->connection_details['options']);
+            $this->connection_details['options']
+        );
     }
 
     /**
      * @param int $retries
+     * @return void
      */
-    public function setDeadlockRetries($retries = 0)
+    public function setDeadlockRetries(int $retries = 0)
     {
         $this->deadlock_retries = $retries;
     }
 
     /**
      * @param int $usleep_time
+     * @return void
      */
-    public function setDeadlockUSleep($usleep_time = 1000)
+    public function setDeadlockUSleep(int $usleep_time = 1000)
     {
         $this->deadlock_usleep = $usleep_time;
     }
@@ -259,7 +276,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     }
 
     /**
-     * @param null $name
+     * @param null|mixed $name
      * @return string
      * @throws \Exception
      */
@@ -280,7 +297,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      * @param int $level
      * @return $this
      */
-    public function setDebugLevel($level = self::DEBUG_OFF)
+    public function setDebugLevel(int $level = self::DEBUG_OFF)
     {
         $this->debugLevel = $level;
 
@@ -304,12 +321,12 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     }
 
     /**
-     * @param $query
-     * @param $params
-     * @param $time
+     * @param string $query
+     * @param mixed  $params
+     * @param int    $time
      * @return bool
      */
-    public function addDebugTimingEntry($query, $params, $time)
+    public function addDebugTimingEntry(string $query, $params, int $time)
     {
         $hash                     = md5($query);
         $this->debugTiming[$hash] = [
@@ -323,11 +340,10 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         ];
 
         return true;
-
     }
 
     /**
-     *
+     * @return void
      */
     public function startWriteLockSafely()
     {
@@ -337,7 +353,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     }
 
     /**
-     *
+     * @return void
      */
     public function endWriteLockSafely()
     {
@@ -364,16 +380,16 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     public function disconnect()
     {
         $query = 'SHOW PROCESSLIST -- '.uniqid('pdo_mysql_close ', 1);
-        try{
+        try {
             $list = $this->query($query)->fetchAll(\PDO::FETCH_ASSOC);
-        } catch(\PDOException $e){
+        } catch (\PDOException $e) {
             return true;
         }
         foreach ($list as $thread) {
             if ($thread['Info'] === $query) {
-                try{
+                try {
                     $this->query('KILL '.$thread['Id']);
-                } catch(\PDOException $e){
+                } catch (\PDOException $e) {
                     return false;
                 }
             }
