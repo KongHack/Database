@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "4df3edd22ffa09b9efc28748b3931eb2",
+    "content-hash": "293f5c23c39db6d8d22f8ef99ab86536",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -381,16 +381,16 @@
         },
         {
             "name": "gcworld/interfaces",
-            "version": "3.1.0",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KongHack/Interfaces.git",
-                "reference": "fc3dfa5d1271bbd10023931acb35179879e9ddf3"
+                "reference": "e5a5a91b4aeea02bd7c981385d2dce6597609102"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KongHack/Interfaces/zipball/fc3dfa5d1271bbd10023931acb35179879e9ddf3",
-                "reference": "fc3dfa5d1271bbd10023931acb35179879e9ddf3",
+                "url": "https://api.github.com/repos/KongHack/Interfaces/zipball/e5a5a91b4aeea02bd7c981385d2dce6597609102",
+                "reference": "e5a5a91b4aeea02bd7c981385d2dce6597609102",
                 "shasum": ""
             },
             "require": {
@@ -418,7 +418,7 @@
                 }
             ],
             "description": "GCWorld Industries Interfaces",
-            "time": "2017-05-12T13:56:55+00:00"
+            "time": "2017-05-12T14:35:51+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
