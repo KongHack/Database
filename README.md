@@ -17,7 +17,7 @@ The GCWorld database system was originally a simple extension of PDO, but has gr
 
 
 ### Version
-2.2.3
+2.3.0
 
 ### Additional Information
 

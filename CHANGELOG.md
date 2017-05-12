@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.3.0](https://gitlab.konghack.com/GCWorld/Database/compare/2.2.3...2.3.0)
+ - @GameCharmer Upgraded to 7.1 features, implemented clean code standards
+
+
 ## [2.2.3](https://gitlab.konghack.com/GCWorld/Database/compare/2.2.2...2.2.3)
  - @GameCharmer Oh WTF PHP.  
  // Declaration of GCWorld\Database\Database::prepare($statement, array $driver_options = Array) should be compatible with PDO::prepare($statement, $options = NULL)  
