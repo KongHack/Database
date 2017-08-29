@@ -107,11 +107,19 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
 
     /**
      * @param string $table
+     * @param string $schema
      * @return bool|string
      */
-    public function getTableComment(string $table)
+    public function getTableComment(string $table, string $schema = null)
     {
-        $schema = $this->getWorkingDatabaseName();
+        if(strpos($table,'.')!==false){
+            $tmp = explode('.',$table);
+            $table = $tmp[1];
+            $schema = $tmp[0];
+        }
+        if($schema == null) {
+            $schema = $this->getWorkingDatabaseName();
+        }
 
         $sql  = 'SELECT TABLE_COMMENT AS comment
                 FROM information_schema.TABLES
