@@ -145,7 +145,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     public function setTableComment(string $table, string $comment)
     {
         // Apparently this cannot be prepared.  Straight exec.
-        $sql = 'ALTER TABLE `'.$table.'` COMMENT = '.$this->quote($comment);
+        $sql = 'ALTER TABLE '.$table.' COMMENT = '.$this->quote($comment);
         $this->exec($sql);
 
         return $this;
