@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.3.4](https://github.com/KongHack/Database/releases/tag/2.3.4)
+ - @GameCharmer Fix Backticks
+
+
 ## [2.3.3](https://github.com/KongHack/Database/releases/tag/2.3.3)
  - @GameCharmer Improved table handling in the getComment function
 
