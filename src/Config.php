@@ -13,12 +13,13 @@ class Config
      * @var array
      */
     protected $config = [];
+    protected static $instance = null;
 
     /**
      * Config constructor.
      * @throws Exception
      */
-    public function __construct()
+    protected function __construct()
     {
         $file  = rtrim(dirname(__FILE__), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
         $file .= 'config'.DIRECTORY_SEPARATOR.'config.ini';
@@ -38,10 +39,21 @@ class Config
     }
 
     /**
+     * @return Config
+     */
+    public static function getInstance()
+    {
+        if(self::$instance == null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    /**
      * @return array
      */
-    public function getConfig()
+    public static function getConfig()
     {
-        return $this->config;
+        return self::getInstance()->config;
     }
 }

@@ -34,8 +34,7 @@ class Controller
     {
         if (!array_key_exists($instanceName, self::$instances)) {
             if (self::$config == null) {
-                $cConfig      = new Config();
-                self::$config = $cConfig->getConfig();
+                self::$config = Config::getInstance()->getConfig();
             }
             if (self::$common == null) {
                 if (!array_key_exists('common', self::$config)) {

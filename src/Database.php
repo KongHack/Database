@@ -38,6 +38,10 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         $this->connection_details['passwd']   = $passwd;
         $this->connection_details['options']  = $options;
 
+        $config = Config::getInstance()->getConfig();
+        $this->deadlock_retries = isset($config['deadlock_retries']) ? $config['deadlock_retries'] : $this->deadlock_retries;
+        $this->deadlock_usleep  = isset($config['deadlock_usleep']) ? $config['deadlock_usleep'] : $this->deadlock_usleep;
+
         parent::__construct($dsn, $username, $passwd, $options);
     }
 
