@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.3.5](https://github.com/KongHack/Database/releases/tag/2.3.5)
+ - @GameCharmer Upgrade to config, support for deadlock settings in the config.ini file, single config loading
+
+
 ## [2.3.4](https://github.com/KongHack/Database/releases/tag/2.3.4)
  - @GameCharmer Fix Backticks
 
