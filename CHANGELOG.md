@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.3.6](https://github.com/KongHack/Database/releases/tag/2.3.6)
+ - @GameCharmer properly handle checking to see if table exists
+
+
 ## [2.3.5](https://github.com/KongHack/Database/releases/tag/2.3.5)
  - @GameCharmer Upgrade to config, support for deadlock settings in the config.ini file, single config loading
 
