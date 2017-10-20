@@ -81,20 +81,33 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     }
 
     /**
-     * Note: This is injectible!  Use with caution!
      * @param string $table
      * @return bool
      */
     public function tableExists(string $table)
     {
-        try {
-            $result = $this->query('SELECT 1 FROM '.$table.' LIMIT 1');
-        } catch (PDOException $e) {
-            return false;
+        $tmp  = explode('.',$table);
+        if(count($tmp) == 2) {
+            $db = $tmp[0];
+            $table = $tmp[1];
+        } else {
+            $db = $this->getWorkingDatabaseName();
         }
-        $good = ($result !== false);
 
-        return $good;
+        $sql = 'SELECT * 
+                FROM information_schema.tables
+                WHERE table_schema = :db
+                  AND table_name = :table
+                LIMIT 1;';
+        $query = $this->prepare($sql);
+        $query->execute([
+            ':db'   => $db,
+            ':table' => $table,
+        ]);
+        $row = $query->fetch();
+        $query->closeCursor();
+
+        return is_array($row);
     }
 
     /**
