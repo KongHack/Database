@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased](https://gitlab.konghack.com/GCWorld/Database)
 
 
+## [2.3.8](https://github.com/KongHack/Database/releases/tag/2.3.8)
+ - @GameCharmer new functions for debugging! `setTrackPath(true)` will enable in-line comments of the calling file and line number
+
+
 ## [2.3.7](https://github.com/KongHack/Database/releases/tag/2.3.7)
  - seld/cli-prompt removed (installed version was 1.0.3)
 
