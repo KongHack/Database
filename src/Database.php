@@ -15,14 +15,16 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     const DEBUG_ADVANCED = 2;
 
 
-    private $connection_details = [];
-    private $deadlock_retries   = 0;
-    private $deadlock_usleep    = 1000;
+    protected $connection_details = [];
+    protected $deadlock_retries   = 0;
+    protected $deadlock_usleep    = 1000;
     /** @var Controller|null */
-    private $controller    = null;
-    private $controller_id = null;
-    private $debugLevel    = 0;
-    private $debugTiming   = [];
+    protected $controller    = null;
+    protected $controller_id = null;
+    protected $debugLevel    = 0;
+    protected $debugTiming   = [];
+    protected $trackPath     = false;
+
 
     /**
      * Database constructor.
@@ -189,6 +191,16 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      */
     public function prepare($statement, $driver_options = null)
     {
+        if($this->trackPath) {
+            $trace = debug_backtrace();
+            if(count($trace) > 1) {
+                $last = $trace[0];
+                $msg = 'F: '.$last['file'].' | L: '.$last['line'];
+                $msg = '/*!999999 '.$msg.' */ ';
+                $statement = $msg.$statement;
+            }
+        }
+
         if ($this->controller != null) {
             if ($this->controller->getMode() == Controller::MODE_SPLIT) {
                 if ($this->controller->isWriteLocked()) {
@@ -421,5 +433,21 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         }
 
         return true;
+    }
+
+    /**
+     * @param bool $track
+     */
+    public function setTrackPath(bool $track)
+    {
+        $this->trackPath = $track;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTrackPath()
+    {
+        return $this->trackPath;
     }
 }
