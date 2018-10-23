@@ -29,7 +29,7 @@ class Config
         $config = parse_ini_file($file, true);
         if (isset($config['config_path'])) {
             $file   = $config['config_path'];
-            $config = parse_ini_file($file, true);
+            $config = parse_ini_file(__DIR__.DIRECTORY_SEPARATOR.$file, true);
         }
         if (!isset($config['common'])) {
             throw new Exception('Config does not contain "common" value!');
