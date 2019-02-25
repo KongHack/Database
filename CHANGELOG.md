@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.3.10](https://github.com/KongHack/Database/releases/tag/2.3.10)
+ - @GameCharmer update Controller for options
+
+
+
 ## [2.3.9](https://github.com/KongHack/Database/releases/tag/2.3.9)
  - @GameCharmer convert config pathing to relative
 
