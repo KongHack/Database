@@ -81,11 +81,22 @@ class Controller
             $dsn = 'mysql:host='.$databaseArray['host'].';dbname='.$databaseArray['name'].
                 (isset($databaseArray['port']) ? ';port='.$databaseArray['port'] : '');
 
+            $options = [];
+            if(isset($databaseArray['ssl_key'])) {
+                $options[Database::MYSQL_ATTR_SSL_KEY] = $databaseArray['ssl_key'];
+            }
+            if(isset($databaseArray['ssl_cert'])) {
+                $options[Database::MYSQL_ATTR_SSL_CERT] = $databaseArray['ssl_cert'];
+            }
+            if(isset($databaseArray['ssl_ca'])) {
+                $options[Database::MYSQL_ATTR_SSL_CA] = $databaseArray['ssl_ca'];
+            }
+
             $database = new Database(
                 $dsn,
                 $databaseArray['user'],
                 $databaseArray['pass'],
-                [Database::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
+                $options
             );
             $database->setDefaults();
             // Do not attach the controller, since single mode will act as a passthru
@@ -99,14 +110,26 @@ class Controller
                 throw new \Exception('Database definition not found in primary config!');
             }
 
-            $dbArray  = $databases[$key];
-            $dsn      = 'mysql:host='.$dbArray['host'].';dbname='.$dbArray['name'].
-                (isset($dbArray['port']) ? ';port='.$dbArray['port'] : '');
+            $databaseArray  = $databases[$key];
+            $dsn      = 'mysql:host='.$databaseArray['host'].';dbname='.$databaseArray['name'].
+                (isset($databaseArray['port']) ? ';port='.$databaseArray['port'] : '');
+
+            $options = [];
+            if(isset($databaseArray['ssl_key'])) {
+                $options[Database::MYSQL_ATTR_SSL_KEY] = $databaseArray['ssl_key'];
+            }
+            if(isset($databaseArray['ssl_cert'])) {
+                $options[Database::MYSQL_ATTR_SSL_CERT] = $databaseArray['ssl_cert'];
+            }
+            if(isset($databaseArray['ssl_ca'])) {
+                $options[Database::MYSQL_ATTR_SSL_CA] = $databaseArray['ssl_ca'];
+            }
+
             $database = new Database(
                 $dsn,
-                $dbArray['user'],
-                $dbArray['pass'],
-                [Database::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
+                $databaseArray['user'],
+                $databaseArray['pass'],
+                $options
             );
             $database->setDefaults();
             $database->attachController($this, self::IDENTIFIER_READ);
@@ -117,13 +140,27 @@ class Controller
             if (!array_key_exists($key, $databases)) {
                 throw new \Exception('Database definition not found in primary config!');
             }
-            $dbArray  = $databases[$key];
-            $dsn      = 'mysql:host='.$dbArray['host'].';dbname='.$dbArray['name'].(isset($dbArray['port']) ? ';port='.$dbArray['port'] : '');
+            $databaseArray  = $databases[$key];
+            $dsn      = 'mysql:host='.$databaseArray['host'].
+                        ';dbname='.$databaseArray['name'].
+                        (isset($databaseArray['port']) ? ';port='.$databaseArray['port'] : '');
+
+            $options = [];
+            if(isset($databaseArray['ssl_key'])) {
+                $options[Database::MYSQL_ATTR_SSL_KEY] = $databaseArray['ssl_key'];
+            }
+            if(isset($databaseArray['ssl_cert'])) {
+                $options[Database::MYSQL_ATTR_SSL_CERT] = $databaseArray['ssl_cert'];
+            }
+            if(isset($databaseArray['ssl_ca'])) {
+                $options[Database::MYSQL_ATTR_SSL_CA] = $databaseArray['ssl_ca'];
+            }
+
             $database = new Database(
                 $dsn,
-                $dbArray['user'],
-                $dbArray['pass'],
-                [Database::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
+                $databaseArray['user'],
+                $databaseArray['pass'],
+                $options
             );
             $database->setDefaults();
             $database->attachController($this, self::IDENTIFIER_WRITE);
