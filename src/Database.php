@@ -141,9 +141,9 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         }
 
         $sql  = 'SELECT TABLE_COMMENT AS comment
-                FROM information_schema.TABLES
-                WHERE TABLE_NAME = :table
-                AND TABLE_SCHEMA = :schema';
+                 FROM information_schema.TABLES
+                 WHERE TABLE_NAME = :table
+                 AND TABLE_SCHEMA = :schema';
         $stmt = $this->prepare($sql);
         $stmt->execute([':table' => $table, ':schema' => $schema]);
         $row = $stmt->fetch();
@@ -251,6 +251,12 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
                         throw $e;
                     }
                 } elseif (stripos($msg, 'has gone away') !== false) {
+                    $this->reconnect();
+                    $done = true;
+                    /** @var DatabaseStatement $return */
+                    $return = parent::prepare($statement, $driver_options);
+                } elseif (stripos($msg, 'connection reset by peer') !== false) {
+                    sleep(1);
                     $this->reconnect();
                     $done = true;
                     /** @var DatabaseStatement $return */
