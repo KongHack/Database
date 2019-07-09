@@ -15,9 +15,11 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     const DEBUG_ADVANCED = 2;
 
 
-    protected $connection_details = [];
-    protected $deadlock_retries   = 0;
-    protected $deadlock_usleep    = 1000;
+    protected $connection_details  = [];
+    protected $deadlock_retries    = 0;
+    protected $deadlock_usleep     = 1000;
+    protected $general_retries     = 0;
+    protected $general_retries_max = 10;
     /** @var Controller|null */
     protected $controller    = null;
     protected $controller_id = null;
@@ -242,6 +244,9 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
                 $done   = true;
             } catch (\Exception $e) {
                 $msg = $e->getMessage();
+                if($this->general_retries >= $this->general_retries_max) {
+                    throw $e;
+                }
                 if (stripos($msg, 'deadlock') !== false) {
                     if ($retries < $this->deadlock_retries) {
                         usleep($this->deadlock_usleep);
@@ -251,11 +256,13 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
                         throw $e;
                     }
                 } elseif (stripos($msg, 'has gone away') !== false) {
+                    ++$this->general_retries;
                     $this->reconnect();
                     $done = true;
                     /** @var DatabaseStatement $return */
                     $return = parent::prepare($statement, $driver_options);
                 } elseif (stripos($msg, 'connection reset by peer') !== false) {
+                    ++$this->general_retries;
                     sleep(1);
                     $this->reconnect();
                     $done = true;
