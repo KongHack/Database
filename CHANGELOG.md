@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.3.11](https://github.com/KongHack/Database/releases/tag/2.3.11)
+ - @GameCharmer added a retry for 'connection reset by peer'
+
+
+
 ## [2.3.10](https://github.com/KongHack/Database/releases/tag/2.3.10)
  - @GameCharmer update Controller for options
 
