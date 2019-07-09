@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.3.12](https://github.com/KongHack/Database/releases/tag/2.3.12)
+ - @GameCharmer add a retry max of 10 to prevent infinite loops.  This is separate from the deadlock retries.
+
+
 ## [2.3.11](https://github.com/KongHack/Database/releases/tag/2.3.11)
  - @GameCharmer added a retry for 'connection reset by peer'
 
