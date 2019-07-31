@@ -14,6 +14,19 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     const DEBUG_BASIC    = 1;
     const DEBUG_ADVANCED = 2;
 
+    /**
+     * Borrowing strings from here:
+     * https://stackoverflow.com/questions/22932723/error-while-sending-stmt-prepare-packet-pid-2
+     */
+    const RECONNECT_STRINGS = [
+        'server has gone away',
+        'no connection to the server',
+        'Lost connection',
+        'is dead or not enabled',
+        'Error while sending',
+        'decryption failed or bad record mac',
+        'SSL connection has been closed unexpectedly',
+    ];
 
     protected $connection_details  = [];
     protected $deadlock_retries    = 0;
@@ -255,20 +268,18 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
                     } else {
                         throw $e;
                     }
-                } elseif (stripos($msg, 'has gone away') !== false) {
-                    ++$this->general_retries;
-                    $this->reconnect();
-                    $done = true;
-                    /** @var DatabaseStatement $return */
-                    $return = parent::prepare($statement, $driver_options);
-                } elseif (stripos($msg, 'connection reset by peer') !== false) {
-                    ++$this->general_retries;
-                    sleep(1);
-                    $this->reconnect();
-                    $done = true;
-                    /** @var DatabaseStatement $return */
-                    $return = parent::prepare($statement, $driver_options);
                 } else {
+                    foreach(self::RECONNECT_STRINGS as $string) {
+                        if(stripos($msg,$string)!==false) {
+                            ++$this->general_retries;
+                            $this->reconnect();
+                            $done = true;
+                            /** @var DatabaseStatement $return */
+                            $return = parent::prepare($statement, $driver_options);
+
+                            return $return;
+                        }
+                    }
                     throw $e;
                 }
             }
