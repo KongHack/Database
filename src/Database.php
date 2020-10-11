@@ -26,13 +26,15 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         'Error while sending',
         'decryption failed or bad record mac',
         'SSL connection has been closed unexpectedly',
+        'Connection reset by peer'
     ];
 
-    protected $connection_details  = [];
-    protected $deadlock_retries    = 0;
-    protected $deadlock_usleep     = 1000;
-    protected $general_retries     = 0;
-    protected $general_retries_max = 10;
+    protected $connection_details   = [];
+    protected $deadlock_retries     = 0;
+    protected $deadlock_retries_max = 10;
+    protected $deadlock_usleep      = 1000;
+    protected $general_retries      = 0;
+    protected $general_retries_max  = 10;
     /** @var Controller|null */
     protected $controller    = null;
     protected $controller_id = null;
@@ -56,8 +58,8 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         $this->connection_details['options']  = $options;
 
         $config = Config::getInstance()->getConfig();
-        $this->deadlock_retries = isset($config['deadlock_retries']) ? $config['deadlock_retries'] : $this->deadlock_retries;
-        $this->deadlock_usleep  = isset($config['deadlock_usleep']) ? $config['deadlock_usleep'] : $this->deadlock_usleep;
+        $this->deadlock_retries_max = isset($config['deadlock_retries']) ? $config['deadlock_retries'] : $this->deadlock_retries_max;
+        $this->deadlock_usleep      = isset($config['deadlock_usleep']) ? $config['deadlock_usleep'] : $this->deadlock_usleep;
 
         parent::__construct($dsn, $username, $passwd, $options);
     }
@@ -202,7 +204,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      * @param mixed $statement
      * @param mixed $driver_options
      * @return DatabaseStatement
-     * @throws \Exception
+     * @throws PDOException
      */
     public function prepare($statement, $driver_options = null)
     {
@@ -248,47 +250,35 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
             $driver_options = [];
         }
 
-
-        $return  = null;
-        $done    = false;
-        $retries = 0;
-
-        while (!$done) {
-            try {
-                /** @var DatabaseStatement $return */
-                $return = parent::prepare($statement, $driver_options);
-                $done   = true;
-            } catch (\Exception $e) {
-                $msg = $e->getMessage();
-                if($this->general_retries >= $this->general_retries_max) {
-                    throw $e;
-                }
-                if (stripos($msg, 'deadlock') !== false) {
-                    if ($retries < $this->deadlock_retries) {
-                        usleep($this->deadlock_usleep);
-                        $done = false;
-                        ++$retries;
-                    } else {
-                        throw $e;
-                    }
-                } else {
-                    foreach(self::RECONNECT_STRINGS as $string) {
-                        if(stripos($msg,$string)!==false) {
-                            ++$this->general_retries;
-                            $this->reconnect();
-                            $done = true;
-                            /** @var DatabaseStatement $return */
-                            $return = parent::prepare($statement, $driver_options);
-
-                            return $return;
-                        }
-                    }
-                    throw $e;
+        try {
+            /** @var DatabaseStatement $return */
+            $return = parent::prepare($statement, $driver_options);
+            return $return;
+        } catch (PDOException $e) {
+            $msg = $e->getMessage();
+            if($this->general_retries >= $this->general_retries_max
+                || $this->deadlock_retries >= $this->deadlock_retries_max
+            ) {
+                throw $e;
+            }
+            if (stripos($msg, 'deadlock') !== false) {
+                ++$this->deadlock_retries_max;
+                usleep($this->deadlock_usleep);
+                return $this->prepare($statement, $driver_options);
+            }
+            foreach(self::RECONNECT_STRINGS as $string) {
+                if(stripos($msg,$string)!==false) {
+                    ++$this->general_retries;
+                    usleep(250);
+                    $this->reconnect();
+                    usleep(250);
+                    /** @var DatabaseStatement $return */
+                    return $this->prepare($statement, $driver_options);
                 }
             }
+            throw $e;
         }
 
-        return $return;
     }
 
     /**
@@ -309,9 +299,9 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      * @param int $retries
      * @return void
      */
-    public function setDeadlockRetries(int $retries = 0)
+    public function setDeadlockRetriesMax(int $retries = 0)
     {
-        $this->deadlock_retries = $retries;
+        $this->deadlock_retries_max = $retries;
     }
 
     /**
@@ -334,6 +324,14 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     /**
      * @return int
      */
+    public function getDeadlockRetriesMax()
+    {
+        return $this->deadlock_retries_max;
+    }
+
+    /**
+     * @return int
+     */
     public function getDeadlockUSleep()
     {
         return $this->deadlock_usleep;
@@ -342,7 +340,6 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     /**
      * @param null|mixed $name
      * @return string
-     * @throws \Exception
      */
     public function lastInsertId($name = null)
     {
