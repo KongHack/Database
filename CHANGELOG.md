@@ -6,7 +6,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
-## [2.3.14](https://github.com/KongHack/Database/releases/tag/2.3.13)
+## [2.3.15](https://github.com/KongHack/Database/releases/tag/2.3.15)
+ - @GameCharmer Cleanup and optimize prepare retry system
+   - ***NOT TESTED WITH CONTROLLERS***, but it should work
+
+
+
+## [2.3.14](https://github.com/KongHack/Database/releases/tag/2.3.14)
  - @GameCharmer Composer Update
  
  - composer/installers updated from v1.6.0 to v1.7.0  
