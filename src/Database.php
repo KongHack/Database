@@ -210,6 +210,9 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
             $trace = debug_backtrace();
             if(count($trace) > 1) {
                 $last = $trace[0];
+                if(substr($last['file'],-12)== 'Database.php' && count($trace) > 1) {
+                    $last = $trace[1];
+                }
                 $msg = 'F: '.$last['file'].' | L: '.$last['line'];
                 $msg = '/*!999999 '.$msg.' */ ';
                 $statement = $msg.$statement;
