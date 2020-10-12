@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.3.16](https://github.com/KongHack/Database/releases/tag/2.3.16)
+ - @GameCharmer Upgrade exception handling from PDO Exception to full Exception
+ - @GameCharmer Composer Update
+
+
+
 ## [2.3.15](https://github.com/KongHack/Database/releases/tag/2.3.15)
  - @GameCharmer Cleanup and optimize prepare retry system
    - ***NOT TESTED WITH CONTROLLERS***, but it should work
