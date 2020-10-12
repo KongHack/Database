@@ -204,7 +204,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      * @param mixed $statement
      * @param mixed $driver_options
      * @return DatabaseStatement
-     * @throws PDOException
+     * @throws \Exception
      */
     public function prepare($statement, $driver_options = null)
     {
@@ -254,7 +254,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
             /** @var DatabaseStatement $return */
             $return = parent::prepare($statement, $driver_options);
             return $return;
-        } catch (PDOException $e) {
+        } catch (\Exception $e) {
             $msg = $e->getMessage();
             if($this->general_retries >= $this->general_retries_max
                 || $this->deadlock_retries >= $this->deadlock_retries_max
