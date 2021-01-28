@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.3.17](https://github.com/KongHack/Database/releases/tag/2.3.17)
+ - @GameCharmer Update Composer Dependencies
+
+
+
 ## [2.3.16](https://github.com/KongHack/Database/releases/tag/2.3.16)
  - @GameCharmer Upgrade exception handling from PDO Exception to full Exception
  - @GameCharmer Composer Update
@@ -29,7 +34,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
    See changes: https://github.com/KongHack/Interfaces/compare/3.2.0...3.3.1  
    Release notes: https://github.com/KongHack/Interfaces/releases/tag/3.3.1
 
- - symfony/process updated from v4.1.5 to v4.4.0  
+ - symfony/process updated from v4.1.5 to v4.4.0
    See changes: https://github.com/symfony/process/compare/v4.1.5...v4.4.0  
    Release notes: https://github.com/symfony/process/releases/tag/v4.4.0
 
