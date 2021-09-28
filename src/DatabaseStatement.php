@@ -1,6 +1,7 @@
 <?php
 namespace GCWorld\Database;
 
+use PDOException;
 use PDOStatement;
 
 /**
@@ -15,7 +16,7 @@ class DatabaseStatement extends PDOStatement
 
     /**
      * DatabaseStatement constructor.
-     * @param \GCWorld\Database\Database $dbh
+     * @param Database $dbh
      */
     protected function __construct(Database $dbh)
     {
@@ -35,7 +36,7 @@ class DatabaseStatement extends PDOStatement
     /**
      * @param null|array $input_parameters
      * @return array|bool
-     * @throws \PDOException
+     * @throws PDOException
      */
     public function execute($input_parameters = null)
     {
@@ -59,7 +60,7 @@ class DatabaseStatement extends PDOStatement
                 $result = parent::execute();
                 break;
 
-            } catch (\PDOException $e) {
+            } catch (PDOException $e) {
                 $msg = $e->getMessage();
 
                 if (stristr($msg, 'deadlock') !== false) {
@@ -93,7 +94,10 @@ class DatabaseStatement extends PDOStatement
         }
 
         if ($this->debugLevel >= Database::DEBUG_ADVANCED) {
-            return array('result' => $result, 'time' => ($end - $start));
+            return [
+                'result' => $result,
+                'time'   => ($end - $start),
+            ];
         }
 
         return $result;
