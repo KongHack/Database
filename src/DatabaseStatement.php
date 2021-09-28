@@ -35,7 +35,7 @@ class DatabaseStatement extends PDOStatement
     /**
      * @param null|array $input_parameters
      * @return array|bool
-     * @throws \Exception
+     * @throws \PDOException
      */
     public function execute($input_parameters = null)
     {
@@ -54,35 +54,36 @@ class DatabaseStatement extends PDOStatement
             try {
                 if (is_array($input_parameters)) {
                     $result = parent::execute($input_parameters);
-                    $done   = true;
-                } else {
-                    $result = parent::execute();
-                    $done   = true;
+                    break;
                 }
-            } catch (\Exception $e) {
+                $result = parent::execute();
+                break;
+
+            } catch (\PDOException $e) {
                 $msg = $e->getMessage();
-                if (stristr($msg, 'deadlock')) {
+
+                if (stristr($msg, 'deadlock') !== false) {
                     if ($retries < $this->dbh->getDeadlockRetries()) {
                         usleep($this->dbh->getDeadlockUSleep());
                         $done = false;
                         ++$retries;
-                    } else {
-                        $done = true;
-                        throw $e;
+                        continue;
                     }
-                } elseif (stristr($msg, 'server has gone away') !== false) {
+
+                    throw $e;
+                }
+
+                if (stristr($msg, 'server has gone away') !== false) {
                     $this->dbh->reconnect();
                     if (is_array($input_parameters)) {
                         $result = parent::execute($input_parameters);
-                        $done   = true;
-                    } else {
-                        $result = parent::execute();
-                        $done   = true;
+                        break;
                     }
-                } else {
-                    $done = true;
-                    throw $e;
+                    $result = parent::execute();
+                    break;
                 }
+
+                throw $e;
             }
         }
 
