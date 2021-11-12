@@ -111,7 +111,12 @@ class DatabaseStatement extends PDOStatement
      */
     public function fetchAll($mode = PDO::FETCH_ASSOC, ...$args)
     {
-        $return = parent::fetchAll($mode, $args);
+        if(empty($args)) {
+            $return = parent::fetchAll($mode);
+        } else {
+            $return = parent::fetchAll($mode, $args);
+        }
+
         if(!$return) {
             return null;
         }
