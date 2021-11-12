@@ -42,7 +42,6 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     protected $debugTiming   = [];
     protected $trackPath     = false;
 
-
     /**
      * Database constructor.
      * @param string $dsn

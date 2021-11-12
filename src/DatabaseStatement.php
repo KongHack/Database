@@ -7,13 +7,18 @@ use PDOStatement;
 
 /**
  * Class DatabaseStatement
- * @package GCWorld\Database
  */
 class DatabaseStatement extends PDOStatement
 {
-    private $debugLevel = 0;
-    /** @var Database */
-    private $dbh = null;
+    /**
+     * @var int
+     */
+    protected $debugLevel = 0;
+
+    /**
+     * @var Database
+     */
+    protected $dbh = null;
 
     /**
      * DatabaseStatement constructor.
@@ -109,7 +114,7 @@ class DatabaseStatement extends PDOStatement
      * @param mixed ...$args
      * @return array|null
      */
-    public function fetchAll($mode = PDO::FETCH_ASSOC, ...$args)
+    public function fetchAllNullable($mode = PDO::FETCH_ASSOC, ...$args)
     {
         if(empty($args)) {
             $return = parent::fetchAll($mode);

@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.4.2](https://github.com/KongHack/Database/releases/tag/2.4.2)
+ - @GameCharmer Avoid overloading fetchAll and instead go with `fetchAllNullable`
+
+
+
 ## [2.4.1](https://github.com/KongHack/Database/releases/tag/2.4.1)
  - @GameCharmer of course PDO would have an issue with `...$args` that PHPStorm auto-generated
    Adding an extra if/else layer on empty args
