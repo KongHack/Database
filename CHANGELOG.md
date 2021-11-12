@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.4.0](https://github.com/KongHack/Database/releases/tag/2.4.0)
+ - @GameCharmer Override FetchAll to return null instead of false
+
+
+
 ## [2.3.17](https://github.com/KongHack/Database/releases/tag/2.3.17)
  - @GameCharmer Update Composer Dependencies
 

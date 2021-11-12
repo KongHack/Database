@@ -1,6 +1,7 @@
 <?php
 namespace GCWorld\Database;
 
+use PDO;
 use PDOException;
 use PDOStatement;
 
@@ -101,5 +102,20 @@ class DatabaseStatement extends PDOStatement
         }
 
         return $result;
+    }
+
+    /**
+     * @param int   $mode
+     * @param mixed ...$args
+     * @return array|null
+     */
+    public function fetchAll($mode = PDO::FETCH_ASSOC, ...$args)
+    {
+        $return = parent::fetchAll($mode, $args);
+        if(!$return) {
+            return null;
+        }
+
+        return $return;
     }
 }
