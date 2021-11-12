@@ -128,4 +128,24 @@ class DatabaseStatement extends PDOStatement
 
         return $return;
     }
+
+    /**
+     * @param int   $mode
+     * @param mixed ...$args
+     * @return array
+     */
+    public function fetchAllArray($mode = PDO::FETCH_ASSOC, ...$args)
+    {
+        if(empty($args)) {
+            $return = parent::fetchAll($mode);
+        } else {
+            $return = parent::fetchAll($mode, $args);
+        }
+
+        if(!$return) {
+            return [];
+        }
+
+        return $return;
+    }
 }

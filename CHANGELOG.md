@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.4.3](https://github.com/KongHack/Database/releases/tag/2.4.3)
+ - @GameCharmer `fetchAllArray` additional method to assist with fixed typing
+
+
+
 ## [2.4.2](https://github.com/KongHack/Database/releases/tag/2.4.2)
  - @GameCharmer Avoid overloading fetchAll and instead go with `fetchAllNullable`
 
