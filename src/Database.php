@@ -46,23 +46,23 @@ class Database extends PDO implements DatabaseInterface
 
     /**
      * Database constructor.
-     * @param string $dsn
-     * @param string $username
-     * @param string $passwd
-     * @param array  $options
+     * @param string  $dsn
+     * @param ?string $username
+     * @param ?string $password
+     * @param ?array  $options
      */
-    public function __construct(string $dsn, string $username, string $passwd, array $options = [])
+    public function __construct(string $dsn, ?string $username = null, ?string $password = null, ?array $options = null)
     {
         $this->connection_details['dsn']      = $dsn;
         $this->connection_details['username'] = $username;
-        $this->connection_details['passwd']   = $passwd;
+        $this->connection_details['password'] = $password;
         $this->connection_details['options']  = $options;
 
         $config = Config::getInstance()->getConfig();
         $this->deadlock_retries_max = isset($config['deadlock_retries']) ? $config['deadlock_retries'] : $this->deadlock_retries_max;
         $this->deadlock_usleep      = isset($config['deadlock_usleep']) ? $config['deadlock_usleep'] : $this->deadlock_usleep;
 
-        parent::__construct($dsn, $username, $passwd, $options);
+        parent::__construct($dsn, $username, $password, $options);
     }
 
     /**
@@ -213,6 +213,7 @@ class Database extends PDO implements DatabaseInterface
             $trace = debug_backtrace();
             if(count($trace) > 1) {
                 $last = $trace[0];
+                // @phpstan-ignore-next-line
                 if(substr($last['file'],-12)== 'Database.php' && count($trace) > 1) {
                     $last = $trace[1];
                 }
@@ -273,7 +274,7 @@ class Database extends PDO implements DatabaseInterface
                     usleep(250);
                     $this->reconnect();
                     usleep(250);
-                    /** @var DatabaseStatement $return */
+
                     return $this->prepare($statement, $driver_options);
                 }
             }
@@ -291,7 +292,7 @@ class Database extends PDO implements DatabaseInterface
         $this->__construct(
             $this->connection_details['dsn'],
             $this->connection_details['username'],
-            $this->connection_details['passwd'],
+            $this->connection_details['password'],
             $this->connection_details['options']
         );
     }

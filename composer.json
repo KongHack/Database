@@ -16,7 +16,7 @@
   },
   "require-dev": {
     "gcworld/code_sniffer_contrib": "^1.0",
-    "phpstan/phpstan": "^0.12",
+    "phpstan/phpstan": "^1.4",
     "phpmd/phpmd": "^2.6"
   },
   "autoload": {

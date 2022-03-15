@@ -47,7 +47,6 @@ class DatabaseStatement extends PDOStatement
     public function execute($input_parameters = null)
     {
         $result  = null;
-        $done    = false;
         $retries = 0;
         $start   = 0;
         $end     = 0;
@@ -58,7 +57,7 @@ class DatabaseStatement extends PDOStatement
             $start = microtime(true);
         }
 
-        while (!$done) {
+        while (true) {
             try {
                 if (is_array($input_parameters)) {
                     $result = parent::execute($input_parameters);
@@ -73,7 +72,6 @@ class DatabaseStatement extends PDOStatement
                 if (stristr($msg, 'deadlock') !== false) {
                     if ($retries < $this->dbh->getDeadlockRetries()) {
                         usleep($this->dbh->getDeadlockUSleep());
-                        $done = false;
                         ++$retries;
                         continue;
                     }
