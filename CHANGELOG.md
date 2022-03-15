@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.5.5](https://github.com/KongHack/Database/releases/tag/2.5.5)
+ - @GameCharmer Deal with Interfaces
+
+
+
 ## [2.5.4](https://github.com/KongHack/Database/releases/tag/2.5.4)
  - @GameCharmer Add setter methods to Config 
 

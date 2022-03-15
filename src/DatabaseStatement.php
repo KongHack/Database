@@ -1,6 +1,7 @@
 <?php
 namespace GCWorld\Database;
 
+use GCWorld\Interfaces\Database\DatabaseStatementInterface;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -8,7 +9,7 @@ use PDOStatement;
 /**
  * Class DatabaseStatement
  */
-class DatabaseStatement extends PDOStatement
+class DatabaseStatement extends PDOStatement implements DatabaseStatementInterface
 {
     /**
      * @var int
@@ -147,7 +148,7 @@ class DatabaseStatement extends PDOStatement
      * @param mixed ...$args
      * @return array
      */
-    public function fetchAllArray($mode = PDO::FETCH_ASSOC, ...$args)
+    public function fetchAllArray($mode = PDO::FETCH_ASSOC, ...$args): array
     {
         if(empty($args)) {
             $return = parent::fetchAll($mode);

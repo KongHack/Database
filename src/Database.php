@@ -1,7 +1,8 @@
 <?php
 namespace GCWorld\Database;
 
-use GCWorld\Database\Interfaces\DatabaseInterface;
+use GCWorld\Interfaces\Database\DatabaseInterface;
+use GCWorld\Interfaces\Database\DatabaseStatementInterface;
 use PDO;
 use PDOException;
 
@@ -204,7 +205,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @param mixed $statement
      * @param mixed $driver_options
-     * @return DatabaseStatement
+     * @return DatabaseStatementInterface
      * @throws \Exception
      */
     public function prepare($statement, $driver_options = null)

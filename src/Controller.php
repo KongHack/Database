@@ -1,7 +1,8 @@
 <?php
 namespace GCWorld\Database;
 
-use GCWorld\Interfaces\Common;
+use GCWorld\Interfaces\CommonInterface;
+use GCWorld\Interfaces\Database\DatabaseInterface;
 
 /**
  * Class Controller
@@ -18,7 +19,7 @@ class Controller
 
     private static $instances = [];
     private static $config    = null;
-    /** @var Common */
+    /** @var CommonInterface */
     private static $common = null;
 
     protected $mode           = 0;
@@ -178,7 +179,7 @@ class Controller
 
     /**
      * @param string $key
-     * @return mixed
+     * @return DatabaseInterface
      * @throws \Exception
      */
     public function getDatabase(string $key)
