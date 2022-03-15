@@ -40,17 +40,17 @@ class Config
             || $config['slow_query_log'] === false
             || strtolower($config['slow_query_log']) === 'false'
         ) {
-            $this->config['slow_query_log']          = false;
-            $this->config['slow_query_log_ms']       = false;
-            $this->config['slow_query_log_callable'] = '';
+            $config['slow_query_log']          = false;
+            $config['slow_query_log_ms']       = false;
+            $config['slow_query_log_callable'] = '';
         }
 
-        $this->slow_query_log          = (bool) $this->config['slow_query_log'];
-        $this->slow_query_log_ms       = (int) $this->config['slow_query_log_ms'];
-        $this->slow_query_log_callable = $this->config['slow_query_log_callable'] ?? null;
+        $this->slow_query_log          = (bool) $config['slow_query_log'];
+        $this->slow_query_log_ms       = (int) $config['slow_query_log_ms'];
+        $this->slow_query_log_callable = $config['slow_query_log_callable'] ?? null;
 
-        if($this->config['slow_query_log']) {
-            if(!is_callable($this->config['slow_query_log_callable'])) {
+        if($config['slow_query_log']) {
+            if(!is_callable($config['slow_query_log_callable'])) {
                 throw new \Exception('Slow Query Log Callable is not callable');
             }
         }

@@ -6,6 +6,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.5.0](https://github.com/KongHack/Database/releases/tag/2.5.0)
+ - @GameCharmer Update Minimum PHP to 8.0
+ - @GameCharmer Implement new Database Interface
+ - @GameCharmer NEW Slow Query Log System
+
+
+
 ## [2.4.3](https://github.com/KongHack/Database/releases/tag/2.4.3)
  - @GameCharmer `fetchAllArray` additional method to assist with fixed typing
 
