@@ -100,4 +100,36 @@ class Config
     {
         return $this->slow_query_log_ms;
     }
+
+    /**
+     * @param bool $log
+     * @return void
+     */
+    public function setSlowQueryLog(bool $log)
+    {
+        $this->slow_query_log = $log;
+    }
+
+    /**
+     * @param int $ms
+     * @return void
+     */
+    public function setSlowQueryLogMs(int $ms)
+    {
+        $this->slow_query_log_ms = $ms;
+    }
+
+    /**
+     * @param string|null $callable
+     * @return void
+     * @throws Exception
+     */
+    public function setSlowQueryLogCallable(?string $callable = null)
+    {
+        if($callable !== null && !is_callable($callable)) {
+            throw new \Exception('Slow Query Log Callable is not callable');
+        }
+
+        $this->slow_query_log_callable = $callable;
+    }
 }
