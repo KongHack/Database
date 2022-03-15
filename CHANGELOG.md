@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.5.2](https://github.com/KongHack/Database/releases/tag/2.5.2)
+ - @GameCharmer Cleanup, PHPStan Update
+
+
+
 ## [2.5.1](https://github.com/KongHack/Database/releases/tag/2.5.1)
  - @GameCharmer Adjustment to Config
 
