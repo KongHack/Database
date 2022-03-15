@@ -3,3 +3,4 @@ src/Generated/*
 vendor/*
 config/config.ini
 config/GCWorld_Database.ini
+stantmp/*
