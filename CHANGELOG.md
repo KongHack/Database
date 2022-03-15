@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.5.4](https://github.com/KongHack/Database/releases/tag/2.5.4)
+ - @GameCharmer Add setter methods to Config 
+
+
+
 ## [2.5.2](https://github.com/KongHack/Database/releases/tag/2.5.2)
  - @GameCharmer Cleanup, PHPStan Update
 
