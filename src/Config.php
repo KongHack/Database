@@ -41,7 +41,7 @@ class Config
             || strtolower($config['slow_query_log']) === 'false'
         ) {
             $config['slow_query_log']          = false;
-            $config['slow_query_log_ms']       = false;
+            $config['slow_query_log_ms']       = 0;
             $config['slow_query_log_callable'] = '';
         }
 

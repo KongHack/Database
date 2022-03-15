@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.5.1](https://github.com/KongHack/Database/releases/tag/2.5.1)
+ - @GameCharmer Adjustment to Config
+
+
+
 ## [2.5.0](https://github.com/KongHack/Database/releases/tag/2.5.0)
  - @GameCharmer Update Minimum PHP to 8.0
  - @GameCharmer Implement new Database Interface
