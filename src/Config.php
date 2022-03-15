@@ -9,11 +9,12 @@ use Exception;
  */
 class Config
 {
-    /**
-     * @var array
-     */
-    protected $config = [];
-    protected static $instance = null;
+    protected static ?self $instance = null;
+    protected array        $config = [];
+
+    protected bool  $slow_query_log          = false;
+    protected int   $slow_query_log_ms       = 1000;
+    protected mixed $slow_query_log_callable = null;
 
     /**
      * Config constructor.
@@ -33,6 +34,25 @@ class Config
         }
         if (!isset($config['common'])) {
             throw new Exception('Config does not contain "common" value!');
+        }
+
+        if(!isset($config['slow_query_log'])
+            || $config['slow_query_log'] === false
+            || strtolower($config['slow_query_log']) === 'false'
+        ) {
+            $this->config['slow_query_log']          = false;
+            $this->config['slow_query_log_ms']       = false;
+            $this->config['slow_query_log_callable'] = '';
+        }
+
+        $this->slow_query_log          = (bool) $this->config['slow_query_log'];
+        $this->slow_query_log_ms       = (int) $this->config['slow_query_log_ms'];
+        $this->slow_query_log_callable = $this->config['slow_query_log_callable'] ?? null;
+
+        if($this->config['slow_query_log']) {
+            if(!is_callable($this->config['slow_query_log_callable'])) {
+                throw new \Exception('Slow Query Log Callable is not callable');
+            }
         }
 
         $this->config = $config;
@@ -55,5 +75,29 @@ class Config
     public static function getConfig()
     {
         return self::getInstance()->config;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSlowQueryLog()
+    {
+        return $this->slow_query_log;
+    }
+
+    /**
+     * @return mixed|string|null
+     */
+    public function getSlowQueryLogCallable()
+    {
+        return $this->slow_query_log_callable;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSlowQueryLogMs()
+    {
+        return $this->slow_query_log_ms;
     }
 }

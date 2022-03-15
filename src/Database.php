@@ -1,6 +1,7 @@
 <?php
 namespace GCWorld\Database;
 
+use GCWorld\Database\Interfaces\DatabaseInterface;
 use PDO;
 use PDOException;
 
@@ -8,7 +9,7 @@ use PDOException;
  * Class Database
  * @package GCWorld\Database
  */
-class Database extends PDO implements \GCWorld\Interfaces\Database
+class Database extends PDO implements DatabaseInterface
 {
     const DEBUG_OFF      = 0;
     const DEBUG_BASIC    = 1;
@@ -29,16 +30,17 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
         'Connection reset by peer'
     ];
 
-    protected $connection_details   = [];
-    protected $deadlock_retries     = 0;
-    protected $deadlock_retries_max = 10;
-    protected $deadlock_usleep      = 1000;
-    protected $general_retries      = 0;
-    protected $general_retries_max  = 10;
+    protected array $connection_details   = [];
+    protected int   $deadlock_retries     = 0;
+    protected int   $deadlock_retries_max = 10;
+    protected int   $deadlock_usleep      = 1000;
+    protected int   $general_retries      = 0;
+    protected int   $general_retries_max  = 10;
+    protected int   $debugLevel    = 0;
+
     /** @var Controller|null */
     protected $controller    = null;
     protected $controller_id = null;
-    protected $debugLevel    = 0;
     protected $debugTiming   = [];
     protected $trackPath     = false;
 
@@ -87,11 +89,11 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     /**
      * @return bool
      */
-    public function ping()
+    public function ping(): bool
     {
         try {
             $this->query('SELECT 1');
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             return false;
         }
 
@@ -102,7 +104,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
      * @param string $table
      * @return bool
      */
-    public function tableExists(string $table)
+    public function tableExists(string $table): bool
     {
         $tmp  = explode('.',$table);
         if(count($tmp) == 2) {
@@ -131,7 +133,7 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     /**
      * @return string
      */
-    public function getWorkingDatabaseName()
+    public function getWorkingDatabaseName(): string
     {
         $stmt = $this->query('select database()');
         $name = $stmt->fetchColumn();
@@ -437,19 +439,19 @@ class Database extends PDO implements \GCWorld\Interfaces\Database
     /**
      * @return bool
      */
-    public function disconnect()
+    public function disconnect(): bool
     {
         $query = 'SHOW PROCESSLIST -- '.uniqid('pdo_mysql_close ', 1);
         try {
             $list = $this->query($query)->fetchAll(\PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
+        } catch (\PDOException) {
             return true;
         }
         foreach ($list as $thread) {
             if ($thread['Info'] === $query) {
                 try {
                     $this->query('KILL '.$thread['Id']);
-                } catch (\PDOException $e) {
+                } catch (\PDOException) {
                     return false;
                 }
             }

@@ -49,11 +49,12 @@ class DatabaseStatement extends PDOStatement
         $result  = null;
         $done    = false;
         $retries = 0;
+        $start   = 0;
+        $end     = 0;
+        $cConfig = Config::getInstance();
+        $slowLog = $cConfig->getSlowQueryLog();
 
-        $start = 0;
-        $end   = 0;
-
-        if ($this->debugLevel >= Database::DEBUG_BASIC) {
+        if ($this->debugLevel >= Database::DEBUG_BASIC || $slowLog) {
             $start = microtime(true);
         }
 
@@ -94,8 +95,10 @@ class DatabaseStatement extends PDOStatement
             }
         }
 
-        if ($this->debugLevel >= Database::DEBUG_BASIC) {
+        if ($this->debugLevel >= Database::DEBUG_BASIC || $slowLog) {
             $end = microtime(true);
+        }
+        if ($this->debugLevel >= Database::DEBUG_BASIC) {
             $this->dbh->addDebugTimingEntry($this->queryString, $input_parameters, ($end - $start));
         }
 
@@ -104,6 +107,18 @@ class DatabaseStatement extends PDOStatement
                 'result' => $result,
                 'time'   => ($end - $start),
             ];
+        }
+        if($slowLog) {
+            $dur = $end - $start;
+            $ms  = $dur * 1000;
+            if($ms >= $cConfig->getSlowQueryLogMs()) {
+                call_user_func_array($cConfig->getSlowQueryLogCallable(),[
+                    'sql'    => $this->queryString,
+                    'params' => $input_parameters,
+                    'dur_ms' => $ms,
+                    'trace'  => debug_backtrace(),
+                ]);
+            }
         }
 
         return $result;
