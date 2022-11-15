@@ -341,10 +341,10 @@ class Database extends PDO implements DatabaseInterface
     }
 
     /**
-     * @param null|mixed $name
-     * @return string
+     * @param null|string $name
+     * @return string|false
      */
-    public function lastInsertId($name = null)
+    public function lastInsertId(?string $name = null): string|false
     {
         if ($this->controller != null) {
             if ($this->controller->getMode() == Controller::MODE_SPLIT) {
