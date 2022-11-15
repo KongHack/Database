@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.6.0](https://github.com/KongHack/Database/releases/tag/2.6.0)
+- @GameCharmer PHP 8.1 Compatibility
+
+
 ## [2.5.5](https://github.com/KongHack/Database/releases/tag/2.5.5)
  - @GameCharmer Deal with Interfaces
 
