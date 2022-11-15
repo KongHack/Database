@@ -41,11 +41,11 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
     }
 
     /**
-     * @param null|array $input_parameters
+     * @param null|array $params
      * @return array|bool
      * @throws PDOException
      */
-    public function execute($input_parameters = null)
+    public function execute(?array $params = null): bool
     {
         $result  = null;
         $retries = 0;
@@ -60,8 +60,8 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
 
         while (true) {
             try {
-                if (is_array($input_parameters)) {
-                    $result = parent::execute($input_parameters);
+                if (is_array($params)) {
+                    $result = parent::execute($params);
                     break;
                 }
                 $result = parent::execute();
@@ -82,8 +82,8 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
 
                 if (stristr($msg, 'server has gone away') !== false) {
                     $this->dbh->reconnect();
-                    if (is_array($input_parameters)) {
-                        $result = parent::execute($input_parameters);
+                    if (is_array($params)) {
+                        $result = parent::execute($params);
                         break;
                     }
                     $result = parent::execute();
@@ -98,7 +98,7 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
             $end = microtime(true);
         }
         if ($this->debugLevel >= Database::DEBUG_BASIC) {
-            $this->dbh->addDebugTimingEntry($this->queryString, $input_parameters, ($end - $start));
+            $this->dbh->addDebugTimingEntry($this->queryString, $params, ($end - $start));
         }
 
         if ($this->debugLevel >= Database::DEBUG_ADVANCED) {
@@ -113,7 +113,7 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
             if($ms >= $cConfig->getSlowQueryLogMs()) {
                 call_user_func_array($cConfig->getSlowQueryLogCallable(),[
                     'sql'    => $this->queryString,
-                    'params' => $input_parameters,
+                    'params' => $params,
                     'dur_ms' => $ms,
                     'trace'  => debug_backtrace(),
                 ]);

@@ -203,12 +203,12 @@ class Database extends PDO implements DatabaseInterface
     }
 
     /**
-     * @param mixed $statement
-     * @param mixed $driver_options
+     * @param mixed $query
+     * @param mixed $options
      * @return DatabaseStatementInterface
      * @throws \Exception
      */
-    public function prepare($statement, $driver_options = null)
+    public function prepare(string $query, $options  = null): DatabaseStatement|false
     {
         if($this->trackPath) {
             $trace = debug_backtrace();
@@ -220,7 +220,7 @@ class Database extends PDO implements DatabaseInterface
                 }
                 $msg = 'F: '.$last['file'].' | L: '.$last['line'];
                 $msg = '/*!999999 '.$msg.' */ ';
-                $statement = $msg.$statement;
+                $query = $msg.$query;
             }
         }
 
@@ -229,33 +229,33 @@ class Database extends PDO implements DatabaseInterface
                 if ($this->controller->isWriteLocked()) {
                     if ($this->controller_id != Controller::IDENTIFIER_WRITE) {
                         return $this->controller->getDatabase(Controller::IDENTIFIER_WRITE)
-                            ->prepare($statement, $driver_options);
+                            ->prepare($query, $options );
                     }
                 } else {
                     // Check the statement
-                    $token = strtoupper(substr(trim($statement), 0, 6));
+                    $token = strtoupper(substr(trim($query), 0, 6));
                     if ($token == 'SELECT') {                                        // If we are reading...
                         if ($this->controller_id != Controller::IDENTIFIER_READ) {   // But this isn't the read db
                             return $this->controller->getDatabase(Controller::IDENTIFIER_READ)
-                                ->prepare($statement, $driver_options);
+                                ->prepare($query, $options );
                         }
                     } else {                                                        // If we are writing...
                         if ($this->controller_id != Controller::IDENTIFIER_WRITE) {  // But this isn't the write db
                             return $this->controller->getDatabase(Controller::IDENTIFIER_WRITE)
-                                ->prepare($statement, $driver_options);
+                                ->prepare($query, $options );
                         }
                     }
                 }
             }
         }
 
-        if ($driver_options == null) {
-            $driver_options = [];
+        if ($options  == null) {
+            $options  = [];
         }
 
         try {
             /** @var DatabaseStatement $return */
-            $return = parent::prepare($statement, $driver_options);
+            $return = parent::prepare($query, $options );
             return $return;
         } catch (\Exception $e) {
             $msg = $e->getMessage();
@@ -267,7 +267,7 @@ class Database extends PDO implements DatabaseInterface
             if (stripos($msg, 'deadlock') !== false) {
                 ++$this->deadlock_retries_max;
                 usleep($this->deadlock_usleep);
-                return $this->prepare($statement, $driver_options);
+                return $this->prepare($query, $options );
             }
             foreach(self::RECONNECT_STRINGS as $string) {
                 if(stripos($msg,$string)!==false) {
@@ -276,7 +276,7 @@ class Database extends PDO implements DatabaseInterface
                     $this->reconnect();
                     usleep(250);
 
-                    return $this->prepare($statement, $driver_options);
+                    return $this->prepare($query, $options );
                 }
             }
             throw $e;
