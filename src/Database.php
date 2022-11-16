@@ -387,10 +387,10 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @param string $query
      * @param mixed  $params
-     * @param int    $time
+     * @param float  $time
      * @return bool
      */
-    public function addDebugTimingEntry(string $query, $params, int $time)
+    public function addDebugTimingEntry(string $query, $params, float $time)
     {
         $hash                     = md5($query);
         $this->debugTiming[$hash] = [

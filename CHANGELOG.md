@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.6.1](https://github.com/KongHack/Database/releases/tag/2.6.1)
+- @GameCharmer Prevent implicit conversion from float
+
+
+
 ## [2.6.0](https://github.com/KongHack/Database/releases/tag/2.6.0)
 - @GameCharmer PHP 8.1 Compatibility
 
