@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.6.2](https://github.com/KongHack/Database/releases/tag/2.6.2)
+- @GameCharmer Update composer installers dependency
+
+
+
 ## [2.6.1](https://github.com/KongHack/Database/releases/tag/2.6.1)
 - @GameCharmer Prevent implicit conversion from float
 
