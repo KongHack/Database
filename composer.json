@@ -11,7 +11,7 @@
     "php": ">=8.0",
     "ext-pdo":"*",
     "gcworld/interfaces": ">=4.1.0",
-    "composer/composer": "^2.0",
+    "composer/composer": "^2.7",
     "composer/installers": ">=2.2"
   },
   "require-dev": {

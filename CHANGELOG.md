@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.6.4](https://github.com/KongHack/Database/releases/tag/2.6.4)
+- @GameCharmer Update composer/composer
+
+
+
 ## [2.6.3](https://github.com/KongHack/Database/releases/tag/2.6.3)
 - @GameCharmer Update composer dependencies (Dependabot)
 
