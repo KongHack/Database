@@ -29,7 +29,7 @@
       "GCWorld\\Database\\ComposerInstaller::setupConfig"
     ]
   },
-  "license":"GPL-3.0",
+  "license":"MIT",
   "config": {
     "allow-plugins": {
       "composer/installers": true
