@@ -35,19 +35,19 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
      * @param int $level
      * @return void
      */
-    public function setDebuggingLevel(int $level)
+    public function setDebuggingLevel(int $level): void
     {
         $this->debugLevel = $level;
     }
 
     /**
      * @param null|array $params
-     * @return array|bool
+     * @return bool
      * @throws PDOException
      */
     public function execute(?array $params = null): bool
     {
-        $result  = null;
+        $result  = false;
         $retries = 0;
         $start   = 0;
         $end     = 0;
@@ -101,17 +101,23 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
             $this->dbh->addDebugTimingEntry($this->queryString, $params, ($end - $start));
         }
 
+        /*
         if ($this->debugLevel >= Database::DEBUG_ADVANCED) {
             return [
                 'result' => $result,
                 'time'   => ($end - $start),
             ];
         }
+        */
         if($slowLog) {
-            $dur = $end - $start;
-            $ms  = $dur * 1000;
-            if($ms >= $cConfig->getSlowQueryLogMs()) {
-                call_user_func_array($cConfig->getSlowQueryLogCallable(),[
+            $dur  = $end - $start;
+            $ms   = $dur * 1000;
+            $call = $cConfig->getSlowQueryLogCallable();
+            if($ms >= $cConfig->getSlowQueryLogMs()
+                && !empty($call)
+                && is_callable($call)
+            ) {
+                call_user_func_array($call, [
                     'sql'    => $this->queryString,
                     'params' => $params,
                     'dur_ms' => $ms,

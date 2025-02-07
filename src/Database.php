@@ -1,6 +1,7 @@
 <?php
 namespace GCWorld\Database;
 
+use Exception;
 use GCWorld\Interfaces\Database\DatabaseInterface;
 use GCWorld\Interfaces\Database\DatabaseStatementInterface;
 use PDO;
@@ -120,13 +121,13 @@ class Database extends PDO implements DatabaseInterface
                 WHERE table_schema = :db
                   AND table_name = :table
                 LIMIT 1;';
-        $query = $this->prepare($sql);
-        $query->execute([
+        $qry = $this->prepare($sql);
+        $qry->execute([
             ':db'   => $db,
             ':table' => $table,
         ]);
-        $row = $query->fetch();
-        $query->closeCursor();
+        $row = $qry->fetch();
+        $qry->closeCursor();
 
         return is_array($row);
     }
@@ -148,9 +149,9 @@ class Database extends PDO implements DatabaseInterface
      * @param string $schema
      * @return bool|string
      */
-    public function getTableComment(string $table, string $schema = null)
+    public function getTableComment(string $table, string $schema = null): bool|string
     {
-        if(strpos($table,'.')!==false){
+        if(str_contains($table, '.')){
             $tmp = explode('.',$table);
             $table = $tmp[1];
             $schema = $tmp[0];
@@ -159,14 +160,17 @@ class Database extends PDO implements DatabaseInterface
             $schema = $this->getWorkingDatabaseName();
         }
 
-        $sql  = 'SELECT TABLE_COMMENT AS comment
-                 FROM information_schema.TABLES
-                 WHERE TABLE_NAME = :table
-                 AND TABLE_SCHEMA = :schema';
-        $stmt = $this->prepare($sql);
-        $stmt->execute([':table' => $table, ':schema' => $schema]);
-        $row = $stmt->fetch();
-        $stmt->closeCursor();
+        $sql= 'SELECT TABLE_COMMENT AS comment
+               FROM information_schema.TABLES
+               WHERE TABLE_NAME = :table
+               AND TABLE_SCHEMA = :schema';
+        $qry = $this->prepare($sql);
+        $qry->execute([
+            ':table'  => $table,
+            ':schema' => $schema,
+        ]);
+        $row = $qry->fetch();
+        $qry->closeCursor();
         if (is_array($row)) {
             return $row['comment'];
         }
@@ -180,7 +184,7 @@ class Database extends PDO implements DatabaseInterface
      * @param string $comment
      * @return $this
      */
-    public function setTableComment(string $table, string $comment)
+    public function setTableComment(string $table, string $comment): static
     {
         // Apparently this cannot be prepared.  Straight exec.
         $sql = 'ALTER TABLE '.$table.' COMMENT = '.$this->quote($comment);
@@ -192,7 +196,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @return $this
      */
-    public function setDefaults()
+    public function setDefaults(): static
     {
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
@@ -206,7 +210,7 @@ class Database extends PDO implements DatabaseInterface
      * @param mixed $query
      * @param mixed $options
      * @return DatabaseStatementInterface
-     * @throws \Exception
+     * @throws Exception
      */
     public function prepare(string $query, $options  = null): DatabaseStatement|false
     {
@@ -215,7 +219,7 @@ class Database extends PDO implements DatabaseInterface
             if(count($trace) > 1) {
                 $last = $trace[0];
                 // @phpstan-ignore-next-line
-                if(substr($last['file'],-12)== 'Database.php' && count($trace) > 1) {
+                if(str_ends_with($last['file'], 'Database.php')) {
                     $last = $trace[1];
                 }
                 $msg = 'F: '.$last['file'].' | L: '.$last['line'];
@@ -257,7 +261,7 @@ class Database extends PDO implements DatabaseInterface
             /** @var DatabaseStatement $return */
             $return = parent::prepare($query, $options );
             return $return;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $msg = $e->getMessage();
             if($this->general_retries >= $this->general_retries_max
                 || $this->deadlock_retries >= $this->deadlock_retries_max
@@ -288,7 +292,7 @@ class Database extends PDO implements DatabaseInterface
      * Attempts to reconnect to the DB
      * @return void
      */
-    public function reconnect()
+    public function reconnect(): void
     {
         $this->__construct(
             $this->connection_details['dsn'],
@@ -302,7 +306,7 @@ class Database extends PDO implements DatabaseInterface
      * @param int $retries
      * @return void
      */
-    public function setDeadlockRetriesMax(int $retries = 0)
+    public function setDeadlockRetriesMax(int $retries = 0): void
     {
         $this->deadlock_retries_max = $retries;
     }
@@ -311,7 +315,7 @@ class Database extends PDO implements DatabaseInterface
      * @param int $usleep_time
      * @return void
      */
-    public function setDeadlockUSleep(int $usleep_time = 1000)
+    public function setDeadlockUSleep(int $usleep_time = 1000): void
     {
         $this->deadlock_usleep = $usleep_time;
     }
@@ -319,7 +323,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @return int
      */
-    public function getDeadlockRetries()
+    public function getDeadlockRetries(): int
     {
         return $this->deadlock_retries;
     }
@@ -327,7 +331,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @return int
      */
-    public function getDeadlockRetriesMax()
+    public function getDeadlockRetriesMax(): int
     {
         return $this->deadlock_retries_max;
     }
@@ -335,7 +339,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @return int
      */
-    public function getDeadlockUSleep()
+    public function getDeadlockUSleep(): int
     {
         return $this->deadlock_usleep;
     }
@@ -361,7 +365,7 @@ class Database extends PDO implements DatabaseInterface
      * @param int $level
      * @return $this
      */
-    public function setDebugLevel(int $level = self::DEBUG_OFF)
+    public function setDebugLevel(int $level = self::DEBUG_OFF): static
     {
         $this->debugLevel = $level;
 
@@ -371,7 +375,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @return int
      */
-    public function getDebugLevel()
+    public function getDebugLevel(): int
     {
         return $this->debugLevel;
     }
@@ -379,7 +383,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @return array
      */
-    public function getDebugTiming()
+    public function getDebugTiming(): array
     {
         return $this->debugTiming;
     }
@@ -390,7 +394,7 @@ class Database extends PDO implements DatabaseInterface
      * @param float  $time
      * @return bool
      */
-    public function addDebugTimingEntry(string $query, $params, float $time)
+    public function addDebugTimingEntry(string $query, mixed $params, float $time): bool
     {
         $hash                     = md5($query);
         $this->debugTiming[$hash] = [
@@ -409,7 +413,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @return void
      */
-    public function startWriteLockSafely()
+    public function startWriteLockSafely(): void
     {
         if ($this->getController() !== null) {
             $this->getController()->startWriteLock();
@@ -419,7 +423,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @return void
      */
-    public function endWriteLockSafely()
+    public function endWriteLockSafely(): void
     {
         if ($this->getController() !== null) {
             $this->getController()->endWriteLock();
@@ -429,7 +433,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @return bool
      */
-    public function isWriteLocked()
+    public function isWriteLocked(): bool
     {
         if ($this->getController() !== null) {
             return $this->getController()->isWriteLocked();
@@ -465,7 +469,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @param bool $track
      */
-    public function setTrackPath(bool $track)
+    public function setTrackPath(bool $track): void
     {
         $this->trackPath = $track;
     }
@@ -473,7 +477,7 @@ class Database extends PDO implements DatabaseInterface
     /**
      * @return bool
      */
-    public function getTrackPath()
+    public function getTrackPath(): bool
     {
         return $this->trackPath;
     }
