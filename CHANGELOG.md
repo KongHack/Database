@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.6.7](https://github.com/KongHack/Database/releases/tag/2.6.7)
+- @GameCharmer Add retry loop in connect
+
+
+
 ## [2.6.6](https://github.com/KongHack/Database/releases/tag/2.6.6)
 - @GameCharmer Update Database Statement to handle unset / non-callable slow query logger
 
