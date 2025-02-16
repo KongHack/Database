@@ -38,6 +38,8 @@ class Database extends PDO implements DatabaseInterface
     protected int   $deadlock_usleep      = 1000;
     protected int   $general_retries      = 0;
     protected int   $general_retries_max  = 10;
+    protected int   $connect_retries      = 0;
+    protected int   $connect_retries_max  = 10;
     protected int   $debugLevel    = 0;
 
     /** @var Controller|null */
@@ -64,8 +66,38 @@ class Database extends PDO implements DatabaseInterface
         $this->deadlock_retries_max = isset($config['deadlock_retries']) ? $config['deadlock_retries'] : $this->deadlock_retries_max;
         $this->deadlock_usleep      = isset($config['deadlock_usleep']) ? $config['deadlock_usleep'] : $this->deadlock_usleep;
 
-        parent::__construct($dsn, $username, $password, $options);
+        $this->doConnect($dsn, $username, $password, $options);
     }
+
+    /**
+     * @param string $dsn
+     * @param string|null $username
+     * @param string|null $password
+     * @param array|null $options
+     * @return void
+     * @throws Exception
+     */
+    protected function doConnect(string $dsn, ?string $username, ?string $password, ?array $options): void
+    {
+        try {
+            parent::__construct($dsn, $username, $password, $options);
+        } catch (Exception $e) {
+            if($this->connect_retries >= $this->connect_retries_max) {
+                throw $e;
+            }
+
+            $msg = $e->getMessage();
+            foreach(self::RECONNECT_STRINGS as $string) {
+                if(stripos($msg,$string)!==false) {
+                    ++$this->connect_retries;
+                    usleep(250);
+                    $this->doConnect($dsn, $username, $password, $options);
+                    return;
+                }
+            }
+        }
+    }
+
 
     /**
      * @param \GCWorld\Database\Controller $controller
