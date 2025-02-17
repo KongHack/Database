@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.7.0](https://github.com/KongHack/Database/releases/tag/2.7.0)
+- @GameCharmer PHP 8.4
+
+
+
 ## [2.6.7](https://github.com/KongHack/Database/releases/tag/2.6.7)
 - @GameCharmer Add retry loop in connect
 
