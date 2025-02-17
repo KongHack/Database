@@ -178,10 +178,10 @@ class Database extends PDO implements DatabaseInterface
 
     /**
      * @param string $table
-     * @param string $schema
+     * @param string|null $schema
      * @return bool|string
      */
-    public function getTableComment(string $table, string $schema = null): bool|string
+    public function getTableComment(string $table, ?string $schema = null): bool|string
     {
         if(str_contains($table, '.')){
             $tmp = explode('.',$table);
