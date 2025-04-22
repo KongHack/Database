@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.7.1](https://github.com/KongHack/Database/releases/tag/2.7.1)
+- @GameCharmer TableSync utility class
+
+
+
 ## [2.7.0](https://github.com/KongHack/Database/releases/tag/2.7.0)
 - @GameCharmer PHP 8.4
 
