@@ -40,31 +40,38 @@ class Database extends PDO implements DatabaseInterface
     protected int   $general_retries_max  = 10;
     protected int   $connect_retries      = 0;
     protected int   $connect_retries_max  = 10;
-    protected int   $debugLevel    = 0;
-
-    /** @var Controller|null */
-    protected $controller    = null;
-    protected $controller_id = null;
-    protected $debugTiming   = [];
-    protected $trackPath     = false;
+    protected int   $debugLevel           = 0;
+    protected array $debugTiming          = [];
+    protected bool  $trackPath            = false;
+    protected DatabasePool $pool;
 
     /**
-     * Database constructor.
-     * @param string  $dsn
-     * @param ?string $username
-     * @param ?string $password
-     * @param ?array  $options
+     * @param string            $dsn
+     * @param string|null       $username
+     * @param string|null       $password
+     * @param array|null        $options
+     * @param DatabasePool|null $pool
      */
-    public function __construct(string $dsn, ?string $username = null, ?string $password = null, ?array $options = null)
-    {
+    public function __construct(
+        #[\SensitiveParameter] string $dsn,
+        #[\SensitiveParameter] ?string $username = null,
+        #[\SensitiveParameter] ?string $password = null,
+        #[\SensitiveParameter] ?array $options = null,
+        ?DatabasePool $pool = null
+    ) {
         $this->connection_details['dsn']      = $dsn;
         $this->connection_details['username'] = $username;
         $this->connection_details['password'] = $password;
         $this->connection_details['options']  = $options;
 
-        $config = Config::getInstance()->getConfig();
-        $this->deadlock_retries_max = isset($config['deadlock_retries']) ? $config['deadlock_retries'] : $this->deadlock_retries_max;
-        $this->deadlock_usleep      = isset($config['deadlock_usleep']) ? $config['deadlock_usleep'] : $this->deadlock_usleep;
+        if($pool === null) {
+            $pool = new DatabasePool($dsn,$username,$password,$options);
+        }
+        $this->pool = $pool;
+
+        $config                     = Config::getInstance()->getConfig();
+        $this->deadlock_retries_max = $config['deadlock_retries'] ?? $this->deadlock_retries_max;
+        $this->deadlock_usleep      = $config['deadlock_usleep'] ?? $this->deadlock_usleep;
 
         $this->doConnect($dsn, $username, $password, $options);
     }
@@ -96,28 +103,6 @@ class Database extends PDO implements DatabaseInterface
                 }
             }
         }
-    }
-
-
-    /**
-     * @param \GCWorld\Database\Controller $controller
-     * @param string                       $identifier
-     * @return $this
-     */
-    public function attachController(Controller $controller, string $identifier)
-    {
-        $this->controller    = $controller;
-        $this->controller_id = $identifier;
-
-        return $this;
-    }
-
-    /**
-     * @return null|Controller
-     */
-    public function getController()
-    {
-        return $this->controller;
     }
 
     /**
@@ -233,18 +218,18 @@ class Database extends PDO implements DatabaseInterface
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         $this->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, ['\\GCWorld\\Database\\DatabaseStatement', [$this]]);
+        $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, ['\\GCWorld\\Database\\DatabaseStatement', [$this, $this->pool]]);
 
         return $this;
     }
 
     /**
-     * @param mixed $query
-     * @param mixed $options
-     * @return DatabaseStatementInterface
+     * @param string $query
+     * @param ?array $options
+     * @return DatabaseStatement|false
      * @throws Exception
      */
-    public function prepare(string $query, $options  = null): DatabaseStatement|false
+    public function prepare(string $query, ?array $options  = null): DatabaseStatement|false
     {
         if($this->trackPath) {
             $trace = debug_backtrace();
@@ -257,31 +242,6 @@ class Database extends PDO implements DatabaseInterface
                 $msg = 'F: '.$last['file'].' | L: '.$last['line'];
                 $msg = '/*!999999 '.$msg.' */ ';
                 $query = $msg.$query;
-            }
-        }
-
-        if ($this->controller != null) {
-            if ($this->controller->getMode() == Controller::MODE_SPLIT) {
-                if ($this->controller->isWriteLocked()) {
-                    if ($this->controller_id != Controller::IDENTIFIER_WRITE) {
-                        return $this->controller->getDatabase(Controller::IDENTIFIER_WRITE)
-                            ->prepare($query, $options );
-                    }
-                } else {
-                    // Check the statement
-                    $token = strtoupper(substr(trim($query), 0, 6));
-                    if ($token == 'SELECT') {                                        // If we are reading...
-                        if ($this->controller_id != Controller::IDENTIFIER_READ) {   // But this isn't the read db
-                            return $this->controller->getDatabase(Controller::IDENTIFIER_READ)
-                                ->prepare($query, $options );
-                        }
-                    } else {                                                        // If we are writing...
-                        if ($this->controller_id != Controller::IDENTIFIER_WRITE) {  // But this isn't the write db
-                            return $this->controller->getDatabase(Controller::IDENTIFIER_WRITE)
-                                ->prepare($query, $options );
-                        }
-                    }
-                }
             }
         }
 
@@ -382,14 +342,6 @@ class Database extends PDO implements DatabaseInterface
      */
     public function lastInsertId(?string $name = null): string|false
     {
-        if ($this->controller != null) {
-            if ($this->controller->getMode() == Controller::MODE_SPLIT) {
-                if ($this->controller_id != Controller::IDENTIFIER_WRITE) {
-                    return $this->controller->getDatabase(Controller::IDENTIFIER_WRITE)->lastInsertId();
-                }
-            }
-        }
-
         return parent::lastInsertId($name);
     }
 
@@ -443,43 +395,11 @@ class Database extends PDO implements DatabaseInterface
     }
 
     /**
-     * @return void
-     */
-    public function startWriteLockSafely(): void
-    {
-        if ($this->getController() !== null) {
-            $this->getController()->startWriteLock();
-        }
-    }
-
-    /**
-     * @return void
-     */
-    public function endWriteLockSafely(): void
-    {
-        if ($this->getController() !== null) {
-            $this->getController()->endWriteLock();
-        }
-    }
-
-    /**
-     * @return bool
-     */
-    public function isWriteLocked(): bool
-    {
-        if ($this->getController() !== null) {
-            return $this->getController()->isWriteLocked();
-        }
-
-        return false;
-    }
-
-    /**
      * @return bool
      */
     public function disconnect(): bool
     {
-        $query = 'SHOW PROCESSLIST -- '.uniqid('pdo_mysql_close ', 1);
+        $query = 'SHOW PROCESSLIST -- '.uniqid('pdo_mysql_close ', true);
         try {
             $list = $this->query($query)->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\PDOException) {

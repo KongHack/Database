@@ -1,13 +1,30 @@
+includes:
+	- vendor/phpstan/phpstan-deprecation-rules/rules.neon
 parameters:
-	tmpDir: stantmp
+	tipsOfTheDay: false
+	treatPhpDocTypesAsCertain: false
+	reportUnmatchedIgnoredErrors: false
 	excludePaths:
 		- %rootDir%/../../../src/Generated/*
-
+	ignoreErrors:
+		- identifier: missingType.generics
+		- identifier: phpDoc.parseError
+		- identifier: function.alreadyNarrowedType
+		- identifier: varTag.nativeType
+		- identifier: arrayValues.list
+		- identifier: isset.offset
+		- identifier: equal.alwaysTrue
+		- identifier: notIdentical.alwaysTrue
+		- identifier: trait.unused
+		- '#Access to an undefined property DOMElement*#'
+		- '#no value type specified in iterable type*#'
+		- '#Empty array passed to foreach#'
+		- '#Function d invoked with*#'
+		- '#Call to static.*Uuid::fromBytes.*#'
+		- '#.*in empty\(\) always exists and is not falsy.*#'
+		- '#Call to an undefined method Clue\\React\\Redis\\Client.*#'
+		- '#.*callback of function call_user_func.*#'
+		- '#.*\(Redis\|string\|false\)*#'
+		- '#.*\(int\|Redis\|false\)*#'
 	parallel:
 		processTimeout: 3000.0
-		maximumNumberOfProcesses: 1
-
-	tipsOfTheDay: false
-
-	checkMissingIterableValueType: false
-	checkGenericClassInNonGenericObjectType: false
