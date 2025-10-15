@@ -12,12 +12,12 @@
     "ext-pdo": "*",
     "composer/composer": "^2.8",
     "composer/installers": ">=2.3",
-    "gcworld/interfaces": ">=4.3",
-    "phpstan/phpstan-deprecation-rules": "^1.2"
+    "gcworld/interfaces": ">=4.3"
   },
   "require-dev": {
     "gcworld/code_sniffer_contrib": "^1.0",
     "phpstan/phpstan": "^1.12",
+    "phpstan/phpstan-deprecation-rules": "^1.2",
     "phpmd/phpmd": "^2.15"
   },
   "autoload": {
