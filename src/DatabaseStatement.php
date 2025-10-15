@@ -131,7 +131,7 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
 
         while (true) {
             try {
-                $result = parent::execute();
+                $result = parent::execute($params);
                 break;
             } catch (PDOException $e) {
                 $msg = $e->getMessage();
@@ -185,12 +185,11 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
 
     /**
      * @param int      $mode
-     * @param mixed ...$args
      * @return array|null
      */
-    public function fetchAllNullable(int $mode = PDO::FETCH_ASSOC, ...$args): ?array
+    public function fetchAllNullable(int $mode = PDO::FETCH_ASSOC): ?array
     {
-        $return = $this->fetchAll($mode, $args);
+        $return = $this->fetchAll($mode);
 
         if(!$return) {
             return null;
@@ -201,12 +200,11 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
 
     /**
      * @param int      $mode
-     * @param mixed ...$args
      * @return array
      */
-    public function fetchAllArray(int $mode = PDO::FETCH_ASSOC, ...$args): array
+    public function fetchAllArray(int $mode = PDO::FETCH_ASSOC): array
     {
-        $return = $this->fetchAll($mode, $args);
+        $return = $this->fetchAll($mode);
 
         if(!$return) {
             return [];
@@ -230,16 +228,15 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
     }
 
     /**
-     * @param $mode
-     * @param ...$args
+     * @param int $mode
      * @return array|mixed
      */
     #[ReturnTypeWillChange]
-    public function fetchAll($mode = null, ...$args): mixed
+    public function fetchAll(int $mode = PDO::FETCH_DEFAULT): mixed
     {
         return $this->delegate
-            ? ($mode === null ? $this->delegate->fetchAll() : $this->delegate->fetchAll($mode, ...$args))
-            : ($mode === null ? parent::fetchAll() : parent::fetchAll($mode, ...$args));
+            ? ($mode === null ? $this->delegate->fetchAll() : $this->delegate->fetchAll($mode))
+            : ($mode === null ? parent::fetchAll() : parent::fetchAll($mode));
     }
 
     /**

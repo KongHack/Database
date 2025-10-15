@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "86fb45b7bb995831b890f94fe7c3c5d1",
+    "content-hash": "13fee222e9a636437f726b7120428840",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -776,16 +776,16 @@
         },
         {
             "name": "gcworld/interfaces",
-            "version": "4.4.7",
+            "version": "4.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KongHack/Interfaces.git",
-                "reference": "1a2d43b1b04439c7099179de077251b3a2e7f92a"
+                "reference": "dcd40cc40999165f6b3fc74693ce9c2991f4ef51"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KongHack/Interfaces/zipball/1a2d43b1b04439c7099179de077251b3a2e7f92a",
-                "reference": "1a2d43b1b04439c7099179de077251b3a2e7f92a",
+                "url": "https://api.github.com/repos/KongHack/Interfaces/zipball/dcd40cc40999165f6b3fc74693ce9c2991f4ef51",
+                "reference": "dcd40cc40999165f6b3fc74693ce9c2991f4ef51",
                 "shasum": ""
             },
             "require": {
@@ -816,9 +816,9 @@
             "description": "GCWorld Interfaces",
             "support": {
                 "issues": "https://github.com/KongHack/Interfaces/issues",
-                "source": "https://github.com/KongHack/Interfaces/tree/4.4.7"
+                "source": "https://github.com/KongHack/Interfaces/tree/4.4.8"
             },
-            "time": "2025-10-09T13:36:23+00:00"
+            "time": "2025-10-15T00:06:52+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -2439,16 +2439,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v3.20.0",
+            "version": "v3.21.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "3468920399451a384bef53cf7996965f7cd40183"
+                "reference": "285123877d4dd97dd7c11842ac5fb7e86e60d81d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/3468920399451a384bef53cf7996965f7cd40183",
-                "reference": "3468920399451a384bef53cf7996965f7cd40183",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/285123877d4dd97dd7c11842ac5fb7e86e60d81d",
+                "reference": "285123877d4dd97dd7c11842ac5fb7e86e60d81d",
                 "shasum": ""
             },
             "require": {
@@ -2502,7 +2502,7 @@
             ],
             "support": {
                 "issues": "https://github.com/twigphp/Twig/issues",
-                "source": "https://github.com/twigphp/Twig/tree/v3.20.0"
+                "source": "https://github.com/twigphp/Twig/tree/v3.21.1"
             },
             "funding": [
                 {
@@ -2514,7 +2514,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-02-13T08:34:43+00:00"
+            "time": "2025-05-03T07:21:55+00:00"
         }
     ],
     "packages-dev": [
