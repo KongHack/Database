@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.7.4](https://github.com/KongHack/Database/releases/tag/2.7.4)
+- @GameCharmer Update PHPStan
+
+
+
 ## [2.7.3](https://github.com/KongHack/Database/releases/tag/2.7.3)
 - @GameCharmer Update Dependencies
 

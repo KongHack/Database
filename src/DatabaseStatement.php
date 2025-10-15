@@ -101,7 +101,7 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
             }
 
             // Execute with either the passed parameters or the originally bound ones
-            $ok             = $stmt->executeInternal($input_parameters ?? null);
+            $ok             = $stmt->executeInternal($params ?? null);
             $this->delegate = $stmt;
             return $ok;
         } catch (\Throwable $t) {
