@@ -229,14 +229,15 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
 
     /**
      * @param int $mode
-     * @return array|mixed
+     * @param ...$args
+     * @return mixed
      */
     #[ReturnTypeWillChange]
-    public function fetchAll(int $mode = PDO::FETCH_DEFAULT): mixed
+    public function fetchAll(int $mode = PDO::FETCH_DEFAULT, ...$args): mixed
     {
         return $this->delegate
-            ? ($mode === null ? $this->delegate->fetchAll() : $this->delegate->fetchAll($mode))
-            : ($mode === null ? parent::fetchAll() : parent::fetchAll($mode));
+            ? $this->delegate->fetchAll($mode, ...$args)
+            : parent::fetchAll($mode, ...$args);
     }
 
     /**
