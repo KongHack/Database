@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.7.7](https://github.com/KongHack/Database/releases/tag/2.7.7)
+- @GameCharmer Update Composer Dependencies
+
+
+
 ## [2.7.6](https://github.com/KongHack/Database/releases/tag/2.7.6)
 - @GameCharmer Reimplement fetchAll args
 
