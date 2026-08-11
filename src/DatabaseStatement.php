@@ -137,7 +137,7 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
                 $msg = $e->getMessage();
 
                 if (stristr($msg, 'deadlock') !== false) {
-                    if ($retries < $this->dbh->getDeadlockRetries()) {
+                    if ($retries < $this->dbh->getDeadlockRetriesMax()) {
                         usleep($this->dbh->getDeadlockUSleep());
                         ++$retries;
                         continue;

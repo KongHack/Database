@@ -88,6 +88,7 @@ class Database extends PDO implements DatabaseInterface
     {
         try {
             parent::__construct($dsn, $username, $password, $options);
+            $this->connect_retries = 0;
         } catch (Exception $e) {
             if($this->connect_retries >= $this->connect_retries_max) {
                 throw $e;
@@ -252,6 +253,8 @@ class Database extends PDO implements DatabaseInterface
         try {
             /** @var DatabaseStatement $return */
             $return = parent::prepare($query, $options );
+            $this->general_retries  = 0;
+            $this->deadlock_retries = 0;
             return $return;
         } catch (Exception $e) {
             $msg = $e->getMessage();
@@ -261,7 +264,7 @@ class Database extends PDO implements DatabaseInterface
                 throw $e;
             }
             if (stripos($msg, 'deadlock') !== false) {
-                ++$this->deadlock_retries_max;
+                ++$this->deadlock_retries;
                 usleep($this->deadlock_usleep);
                 return $this->prepare($query, $options );
             }
@@ -290,7 +293,8 @@ class Database extends PDO implements DatabaseInterface
             $this->connection_details['dsn'],
             $this->connection_details['username'],
             $this->connection_details['password'],
-            $this->connection_details['options']
+            $this->connection_details['options'],
+            $this->pool
         );
     }
 

@@ -42,6 +42,7 @@ class DatabasePool
         }
 
         $cDB = new Database($this->dsn, $this->username, $this->password, $this->options);
+        $cDB->setDefaults();
         $this->inUse->attach($cDB);
 
         return $cDB;
