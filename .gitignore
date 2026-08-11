@@ -4,3 +4,4 @@ vendor/*
 config/config.ini
 config/GCWorld_Database.ini
 stantmp/*
+docker-compose-local.yml
