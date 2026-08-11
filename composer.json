@@ -15,7 +15,7 @@
     "gcworld/interfaces": ">=4.4.8"
   },
   "require-dev": {
-    "gcworld/code_sniffer_contrib": "^1.0",
+    "gcworld/code_sniffer_contrib": "*",
     "phpstan/phpstan": "2.1.11",
     "phpstan/phpstan-deprecation-rules": "2.0.1",
     "phpmd/phpmd": "^2.15"
