@@ -4,6 +4,7 @@ namespace GCWorld\Database;
 use Exception;
 use GCWorld\Interfaces\Database\DatabaseInterface;
 use GCWorld\Interfaces\Database\DatabaseStatementInterface;
+use GCWorld\Database\Query\SelectBuilder;
 use PDO;
 use PDOException;
 
@@ -436,5 +437,10 @@ class Database extends PDO implements DatabaseInterface
     public function getTrackPath(): bool
     {
         return $this->trackPath;
+    }
+
+    public function selectBuilder(): SelectBuilder
+    {
+        return new SelectBuilder($this);
     }
 }
