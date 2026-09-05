@@ -60,4 +60,4 @@ Duplicate joins are emitted once when the same key or normalized definition is r
 Named parameters are stored internally without the leading `:` so the output of `getParams()` can be passed directly to PDO `execute()`.
 
 ### Version
-2.7.7
+2.7.8
