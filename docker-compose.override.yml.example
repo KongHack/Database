@@ -1,0 +1,11 @@
+services:
+  php:
+    volumes:
+      - type: bind
+        source: '${HOME}/.config/composer/auth.json'
+        target: '/tmp/formconfig-home/.composer/auth.json'
+        read_only: true
+      - type: bind
+        source: '${HOME}/.ssh'
+        target: '/tmp/formconfig-home/.ssh'
+        read_only: true

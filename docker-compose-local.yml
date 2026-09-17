@@ -1,0 +1,12 @@
+services:
+  php:
+    image: 'ghcr.io/konghack/php:8.4'
+    working_dir: /var/www
+    user: '${HOST_UID:-1000}:${HOST_GID:-1000}'
+    environment:
+      HOME: '/tmp/formconfig-home'
+      COMPOSER_HOME: '/tmp/formconfig-home/.composer'
+    volumes:
+      - './:/var/www'
+    init: true
+    command: 'sleep infinity'

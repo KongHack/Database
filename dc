@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export HOST_UID="$(id -u)"
-export HOST_GID="$(id -g)"
-export HOST_USER="$(id -un)"
+HOST_UID="$(id -u)"
+HOST_GID="$(id -g)"
+export HOST_UID HOST_GID
 
-docker compose -f docker-compose-local.yml "$@"
+compose_files=(-f docker-compose-local.yml)
+if [[ -f docker-compose.override.yml ]]; then
+    compose_files+=(-f docker-compose.override.yml)
+fi
+
+docker compose "${compose_files[@]}" "$@"
