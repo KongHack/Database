@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/KongHack/Database/commits/master)
 
+
+
+## [2.8.0](https://github.com/KongHack/Database/releases/tag/2.8.0)
+
 ### Added
 
 - Added distinct selection, `HAVING`, explicit replace/append methods, stricter

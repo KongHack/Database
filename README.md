@@ -10,7 +10,7 @@ values belong in prepared-statement parameters and must never be interpolated
 into SQL fragments.
 
 ### Version
-2.7.8
+2.8.0
 
 ## Requirements
 
