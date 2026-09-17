@@ -1,4 +1,5 @@
 <?php
+
 namespace GCWorld\Database;
 
 use Exception;
@@ -10,10 +11,12 @@ use Exception;
 class Config
 {
     protected static ?self $instance = null;
-    protected array        $config = [];
 
-    protected bool  $slow_query_log          = false;
-    protected int   $slow_query_log_ms       = 1000;
+    /** @var array<string, mixed> */
+    protected array $config = [];
+
+    protected bool $slow_query_log          = false;
+    protected int $slow_query_log_ms       = 1000;
     protected mixed $slow_query_log_callable = null;
 
     /**
@@ -22,21 +25,22 @@ class Config
      */
     protected function __construct()
     {
-        $file  = rtrim(dirname(__FILE__), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
-        $file .= 'config'.DIRECTORY_SEPARATOR.'config.ini';
+        $file  = rtrim(dirname(__FILE__), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
+        $file .= 'config' . DIRECTORY_SEPARATOR . 'config.ini';
         if (!file_exists($file)) {
             throw new Exception('Config File Not Found');
         }
         $config = parse_ini_file($file, true);
         if (isset($config['config_path'])) {
             $file   = $config['config_path'];
-            $config = parse_ini_file(__DIR__.DIRECTORY_SEPARATOR.$file, true);
+            $config = parse_ini_file(__DIR__ . DIRECTORY_SEPARATOR . $file, true);
         }
         if (!isset($config['common'])) {
             throw new Exception('Config does not contain "common" value!');
         }
 
-        if(!isset($config['slow_query_log'])
+        if (
+            !isset($config['slow_query_log'])
             || $config['slow_query_log'] === false
             || strtolower($config['slow_query_log']) === 'false'
         ) {
@@ -49,8 +53,8 @@ class Config
         $this->slow_query_log_ms       = (int) $config['slow_query_log_ms'];
         $this->slow_query_log_callable = $config['slow_query_log_callable'] ?? null;
 
-        if($config['slow_query_log']) {
-            if(!is_callable($config['slow_query_log_callable'])) {
+        if ($config['slow_query_log']) {
+            if (!is_callable($config['slow_query_log_callable'])) {
                 throw new \Exception('Slow Query Log Callable is not callable');
             }
         }
@@ -63,14 +67,14 @@ class Config
      */
     public static function getInstance()
     {
-        if(self::$instance == null) {
+        if (self::$instance == null) {
             self::$instance = new self();
         }
         return self::$instance;
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     public static function getConfig()
     {
@@ -126,7 +130,7 @@ class Config
      */
     public function setSlowQueryLogCallable(?string $callable = null)
     {
-        if($callable !== null && !is_callable($callable)) {
+        if ($callable !== null && !is_callable($callable)) {
             throw new \Exception('Slow Query Log Callable is not callable');
         }
 

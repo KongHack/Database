@@ -1,4 +1,5 @@
 <?php
+
 namespace GCWorld\Database\Query;
 
 /**
@@ -68,12 +69,12 @@ final readonly class Join
      */
     public function render(): string
     {
-        $sql = $this->type.' JOIN '.$this->table;
-        if($this->alias !== null) {
-            $sql .= ' '.$this->alias;
+        $sql = $this->type . ' JOIN ' . $this->table;
+        if ($this->alias !== null) {
+            $sql .= ' ' . $this->alias;
         }
 
-        return $sql.' ON '.$this->on;
+        return $sql . ' ON ' . $this->on;
     }
 
     /**

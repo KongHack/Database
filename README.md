@@ -59,5 +59,19 @@ Duplicate joins are emitted once when the same key or normalized definition is r
 
 Named parameters are stored internally without the leading `:` so the output of `getParams()` can be passed directly to PDO `execute()`.
 
+## Development
+
+The repository includes a Docker Compose environment based on the same PHP image used in CI:
+
+```bash
+./dc up -d
+./dc exec php composer install
+./dc exec php composer check
+```
+
+Copy `docker-compose.override.yml.example` to `docker-compose.override.yml` when local Composer credentials or SSH access are required. The override file is ignored by Git.
+
+The Composer quality suite runs PHP syntax checks, PHPStan level 6, PHPCS with PSR-12, and PHPUnit tests. GitHub Actions runs the suite on PHP 8.4 and 8.5. Semantic-version tags also validate the version metadata and create GitHub releases from the matching changelog entry.
+
 ### Version
 2.7.8

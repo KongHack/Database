@@ -1,4 +1,5 @@
 <?php
+
 namespace GCWorld\Database;
 
 use GCWorld\Interfaces\Database\DatabaseStatementInterface;
@@ -14,8 +15,9 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
 {
     protected int $debugLevel;
 
-    protected array         $bound      = [];
-    protected ?Database     $borrowedDB = null;
+    /** @var array<int|string, array<int, mixed>> */
+    protected array $bound = [];
+    protected ?Database $borrowedDB = null;
     protected ?PDOStatement $delegate   = null;
 
     /**
@@ -65,7 +67,7 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
     }
 
     /**
-     * @param array|null $params
+     * @param array<int|string, mixed>|null $params
      * @return bool
      * @throws \Throwable
      */
@@ -112,7 +114,7 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
     }
 
     /**
-     * @param null|array $params
+     * @param array<int|string, mixed>|null $params
      * @return bool
      * @throws PDOException
      */
@@ -163,14 +165,23 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
             $this->dbh->addDebugTimingEntry($this->queryString, $params, ($end - $start));
         }
 
-        if($slowLog) {
+        if ($slowLog) {
             $dur  = $end - $start;
             $ms   = $dur * 1000;
             $call = $cConfig->getSlowQueryLogCallable();
-            if($ms >= $cConfig->getSlowQueryLogMs()
+            if (
+                $ms >= $cConfig->getSlowQueryLogMs()
                 && !empty($call)
                 && is_callable($call)
             ) {
+                /**
+                 * @var callable(
+                 *     string $sql,
+                 *     array<int|string, mixed>|null $params,
+                 *     float $dur_ms,
+                 *     array<int, array<string, mixed>> $trace
+                 * ): void $call
+                 */
                 call_user_func_array($call, [
                     'sql'    => $this->queryString,
                     'params' => $params,
@@ -185,13 +196,13 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
 
     /**
      * @param int      $mode
-     * @return array|null
+     * @return array<int, mixed>|null
      */
     public function fetchAllNullable(int $mode = PDO::FETCH_ASSOC): ?array
     {
         $return = $this->fetchAll($mode);
 
-        if(!$return) {
+        if (!$return) {
             return null;
         }
 
@@ -200,13 +211,13 @@ class DatabaseStatement extends PDOStatement implements DatabaseStatementInterfa
 
     /**
      * @param int      $mode
-     * @return array
+     * @return array<int, mixed>
      */
     public function fetchAllArray(int $mode = PDO::FETCH_ASSOC): array
     {
         $return = $this->fetchAll($mode);
 
-        if(!$return) {
+        if (!$return) {
             return [];
         }
 

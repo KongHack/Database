@@ -1,4 +1,5 @@
 <?php
+
 namespace GCWorld\Database\Query\Exception;
 
 /**

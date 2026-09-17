@@ -1,4 +1,5 @@
 <?php
+
 namespace GCWorld\Database;
 
 /**
@@ -6,7 +7,10 @@ namespace GCWorld\Database;
  */
 class DatabasePool
 {
+    /** @var list<Database> */
     protected array $free = [];
+
+    /** @var \SplObjectStorage<Database, null> */
     protected \SplObjectStorage $inUse;
     protected int $max;
 
@@ -14,7 +18,7 @@ class DatabasePool
      * @param string $dsn
      * @param string|null $username
      * @param string|null $password
-     * @param array|null $options
+     * @param array<int, mixed>|null $options
      * @param int $maxSize
      */
     public function __construct(
@@ -33,11 +37,11 @@ class DatabasePool
      */
     public function get(): Database
     {
-        if($out = array_pop($this->free)) {
+        if ($out = array_pop($this->free)) {
             $this->inUse->attach($out);
             return $out;
         }
-        if(count($this->inUse) >= $this->max) {
+        if (count($this->inUse) >= $this->max) {
             throw new \RuntimeException('Database pool exhausted for this request');
         }
 
@@ -54,7 +58,7 @@ class DatabasePool
      */
     public function put(Database $cDB): void
     {
-        if($this->inUse->contains($cDB)) {
+        if ($this->inUse->contains($cDB)) {
             $this->inUse->detach($cDB);
             $this->free[] = $cDB;
         }

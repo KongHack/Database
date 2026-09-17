@@ -1,4 +1,5 @@
 <?php
+
 namespace GCWorld\Database\Query;
 
 use GCWorld\Database\Database;
@@ -13,17 +14,33 @@ use GCWorld\Database\Query\Exception\QueryBuilderException;
 final class SelectBuilder
 {
     protected ?Database $db = null;
+
+    /** @var list<string> */
     protected array $columns      = [];
     protected ?string $fromTable  = null;
     protected ?string $fromAlias  = null;
+
+    /** @var list<Join> */
     protected array $joins        = [];
+
+    /** @var array<string, Join> */
     protected array $joinsByKey   = [];
+
+    /** @var array<string, Join> */
     protected array $joinsByAlias = [];
+
+    /** @var list<array{type: string, sql: string}> */
     protected array $where        = [];
+
+    /** @var list<string> */
     protected array $groupBy      = [];
+
+    /** @var list<string> */
     protected array $orderBy      = [];
     protected ?int $limit         = null;
     protected ?int $offset        = null;
+
+    /** @var array<string, mixed> */
     protected array $params       = [];
 
     /**
@@ -40,9 +57,9 @@ final class SelectBuilder
      */
     public function select(string ...$columns): static
     {
-        foreach($columns as $column) {
+        foreach ($columns as $column) {
             $column = trim($column);
-            if($column !== '') {
+            if ($column !== '') {
                 $this->columns[] = $column;
             }
         }
@@ -58,7 +75,7 @@ final class SelectBuilder
     public function from(string $table, ?string $alias = null): static
     {
         $table = trim($table);
-        if($table === '') {
+        if ($table === '') {
             throw new QueryBuilderException('FROM table cannot be empty');
         }
 
@@ -127,9 +144,9 @@ final class SelectBuilder
      */
     public function groupBy(string ...$expressions): static
     {
-        foreach($expressions as $expression) {
+        foreach ($expressions as $expression) {
             $expression = trim($expression);
-            if($expression !== '') {
+            if ($expression !== '') {
                 $this->groupBy[] = $expression;
             }
         }
@@ -143,9 +160,9 @@ final class SelectBuilder
      */
     public function orderBy(string ...$expressions): static
     {
-        foreach($expressions as $expression) {
+        foreach ($expressions as $expression) {
             $expression = trim($expression);
-            if($expression !== '') {
+            if ($expression !== '') {
                 $this->orderBy[] = $expression;
             }
         }
@@ -159,7 +176,7 @@ final class SelectBuilder
      */
     public function limit(int $limit): static
     {
-        if($limit < 0) {
+        if ($limit < 0) {
             throw new QueryBuilderException('LIMIT cannot be negative');
         }
 
@@ -174,7 +191,7 @@ final class SelectBuilder
      */
     public function offset(int $offset): static
     {
-        if($offset < 0) {
+        if ($offset < 0) {
             throw new QueryBuilderException('OFFSET cannot be negative');
         }
 
@@ -191,9 +208,9 @@ final class SelectBuilder
     public function setParam(string $name, mixed $value): static
     {
         $name = $this->normalizeParamName($name);
-        if(array_key_exists($name, $this->params) && $this->params[$name] !== $value) {
+        if (array_key_exists($name, $this->params) && $this->params[$name] !== $value) {
             throw new DuplicateParameterConflictException(
-                'Conflicting value provided for named parameter ":'.$name.'"'
+                'Conflicting value provided for named parameter ":' . $name . '"'
             );
         }
 
@@ -203,13 +220,13 @@ final class SelectBuilder
     }
 
     /**
-     * @param array $params
+     * @param array<string, mixed> $params
      * @return $this
      */
     public function setParams(array $params): static
     {
-        foreach($params as $name => $value) {
-            if(!is_string($name) || trim($name) === '') {
+        foreach ($params as $name => $value) {
+            if (!is_string($name) || trim($name) === '') {
                 throw new QueryBuilderException('Parameter names must be non-empty strings');
             }
 
@@ -248,7 +265,7 @@ final class SelectBuilder
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     public function getParams(): array
     {
@@ -262,12 +279,12 @@ final class SelectBuilder
     public function prepare(?Database $db = null): DatabaseStatement
     {
         $resolvedDb = $db ?? $this->db;
-        if($resolvedDb === null) {
+        if ($resolvedDb === null) {
             throw new QueryBuilderException('No Database instance is available for prepare()');
         }
 
         $stmt = $resolvedDb->prepare($this->getSql());
-        if($stmt === false) {
+        if ($stmt === false) {
             throw new QueryBuilderException('Failed to prepare generated SQL');
         }
 
@@ -291,38 +308,38 @@ final class SelectBuilder
      */
     public function getSql(): string
     {
-        if($this->fromTable === null) {
+        if ($this->fromTable === null) {
             throw new QueryBuilderException('Cannot build SELECT without a FROM table');
         }
 
-        $sql = 'SELECT '.(empty($this->columns) ? '*' : implode(', ', $this->columns));
-        $sql .= ' FROM '.$this->fromTable;
-        if($this->fromAlias !== null) {
-            $sql .= ' '.$this->fromAlias;
+        $sql = 'SELECT ' . (empty($this->columns) ? '*' : implode(', ', $this->columns));
+        $sql .= ' FROM ' . $this->fromTable;
+        if ($this->fromAlias !== null) {
+            $sql .= ' ' . $this->fromAlias;
         }
 
-        foreach($this->joins as $join) {
-            $sql .= ' '.$join->render();
+        foreach ($this->joins as $join) {
+            $sql .= ' ' . $join->render();
         }
 
-        if(!empty($this->where)) {
-            $sql .= ' WHERE '.$this->renderWhere();
+        if (!empty($this->where)) {
+            $sql .= ' WHERE ' . $this->renderWhere();
         }
 
-        if(!empty($this->groupBy)) {
-            $sql .= ' GROUP BY '.implode(', ', $this->groupBy);
+        if (!empty($this->groupBy)) {
+            $sql .= ' GROUP BY ' . implode(', ', $this->groupBy);
         }
 
-        if(!empty($this->orderBy)) {
-            $sql .= ' ORDER BY '.implode(', ', $this->orderBy);
+        if (!empty($this->orderBy)) {
+            $sql .= ' ORDER BY ' . implode(', ', $this->orderBy);
         }
 
-        if($this->limit !== null) {
-            $sql .= ' LIMIT '.$this->limit;
+        if ($this->limit !== null) {
+            $sql .= ' LIMIT ' . $this->limit;
         }
 
-        if($this->offset !== null) {
-            $sql .= ' OFFSET '.$this->offset;
+        if ($this->offset !== null) {
+            $sql .= ' OFFSET ' . $this->offset;
         }
 
         return $sql;
@@ -336,10 +353,10 @@ final class SelectBuilder
     {
         $joinLookupKey = $join->key ?? $join->signature();
 
-        if(isset($this->joinsByKey[$joinLookupKey])) {
-            if(!$this->joinsByKey[$joinLookupKey]->sameDefinition($join)) {
+        if (isset($this->joinsByKey[$joinLookupKey])) {
+            if (!$this->joinsByKey[$joinLookupKey]->sameDefinition($join)) {
                 throw new DuplicateJoinConflictException(
-                    'Join key/signature conflict detected for "'.$joinLookupKey.'"'
+                    'Join key/signature conflict detected for "' . $joinLookupKey . '"'
                 );
             }
 
@@ -347,9 +364,9 @@ final class SelectBuilder
         }
 
         $aliasKey = $join->alias ?? $join->table;
-        if(isset($this->joinsByAlias[$aliasKey]) && !$this->joinsByAlias[$aliasKey]->sameDefinition($join)) {
+        if (isset($this->joinsByAlias[$aliasKey]) && !$this->joinsByAlias[$aliasKey]->sameDefinition($join)) {
             throw new DuplicateJoinConflictException(
-                'Join alias/table conflict detected for "'.$aliasKey.'"'
+                'Join alias/table conflict detected for "' . $aliasKey . '"'
             );
         }
 
@@ -368,7 +385,7 @@ final class SelectBuilder
     protected function addWhereClause(string $type, string $condition): static
     {
         $condition = trim($condition);
-        if($condition === '') {
+        if ($condition === '') {
             throw new QueryBuilderException('WHERE condition cannot be empty');
         }
 
@@ -386,13 +403,13 @@ final class SelectBuilder
     protected function renderWhere(): string
     {
         $parts = [];
-        foreach($this->where as $index => $clause) {
-            if($index === 0 || $clause['type'] === 'ROOT') {
+        foreach ($this->where as $index => $clause) {
+            if ($index === 0 || $clause['type'] === 'ROOT') {
                 $parts[] = $clause['sql'];
                 continue;
             }
 
-            $parts[] = $clause['type'].' '.$clause['sql'];
+            $parts[] = $clause['type'] . ' ' . $clause['sql'];
         }
 
         return implode(' ', $parts);
@@ -405,7 +422,7 @@ final class SelectBuilder
     protected function normalizeParamName(string $name): string
     {
         $name = ltrim(trim($name), ':');
-        if($name === '') {
+        if ($name === '') {
             throw new QueryBuilderException('Parameter name cannot be empty');
         }
 

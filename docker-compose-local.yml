@@ -4,8 +4,8 @@ services:
     working_dir: /var/www
     user: '${HOST_UID:-1000}:${HOST_GID:-1000}'
     environment:
-      HOME: '/tmp/formconfig-home'
-      COMPOSER_HOME: '/tmp/formconfig-home/.composer'
+      HOME: '/tmp/database-home'
+      COMPOSER_HOME: '/tmp/database-home/.composer'
     volumes:
       - './:/var/www'
     init: true

@@ -1,0 +1,114 @@
+name: PHP quality and release
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+
+concurrency:
+  group: php-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/konghack/php:${{ matrix.php }}
+    strategy:
+      fail-fast: false
+      matrix:
+        php:
+          - "8.4"
+          - "8.5"
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Validate release metadata
+        if: github.ref_type == 'tag'
+        shell: bash
+        run: |
+          version="$(tr -d '\r\n' < VERSION)"
+          readme_version="$(awk '/^### Version$/ { getline; print; exit }' README.md)"
+
+          if [[ "$version" != "$GITHUB_REF_NAME" ]]; then
+            echo "::error::VERSION contains '$version', but the Git tag is '$GITHUB_REF_NAME'."
+            exit 1
+          fi
+
+          if [[ "$readme_version" != "$GITHUB_REF_NAME" ]]; then
+            echo "::error::README version is '$readme_version', but the Git tag is '$GITHUB_REF_NAME'."
+            exit 1
+          fi
+
+          if ! grep -Fqx "## [$GITHUB_REF_NAME](https://github.com/KongHack/Database/releases/tag/$GITHUB_REF_NAME)" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no exact release heading for $GITHUB_REF_NAME."
+            exit 1
+          fi
+
+      - name: Validate Composer metadata
+        run: composer validate --strict --no-interaction
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Audit locked dependencies
+        run: composer audit --locked --no-interaction
+
+      - name: Run quality suite
+        run: composer check
+
+  release:
+    name: Create GitHub release
+    if: github.ref_type == 'tag'
+    needs: quality
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Extract release notes
+        shell: bash
+        run: |
+          notes_file="$RUNNER_TEMP/release-notes.md"
+
+          awk -v version="$GITHUB_REF_NAME" '
+            index($0, "## [" version "]") == 1 { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+            END { if (!found) exit 1 }
+          ' CHANGELOG.md > "$notes_file"
+
+          if [[ ! -s "$notes_file" ]]; then
+            echo "::error::No release notes found for $GITHUB_REF_NAME."
+            exit 1
+          fi
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            echo "GitHub release $GITHUB_REF_NAME already exists."
+            exit 0
+          fi
+
+          gh release create "$GITHUB_REF_NAME" \
+            --verify-tag \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file "$RUNNER_TEMP/release-notes.md"

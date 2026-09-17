@@ -4,4 +4,5 @@ vendor/*
 config/config.ini
 config/GCWorld_Database.ini
 stantmp/*
+.phpunit.cache/
 docker-compose.override.yml

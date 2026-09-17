@@ -2,7 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased](https://gitlab.konghack.com/GCWorld/Database)
+## [Unreleased](https://github.com/KongHack/Database/commits/master)
+
+- @GameCharmer Add PHP 8.4/8.5 GitHub Actions quality checks and tag-driven release automation.
+- @GameCharmer Add weekly Dependabot checks for Composer and GitHub Actions.
+- @GameCharmer Replace the legacy custom coding standard with PSR-12 and add a unified Composer quality suite.
+- @GameCharmer Add PHPUnit characterization coverage for the query builder.
 
 
 

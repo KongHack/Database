@@ -1,4 +1,5 @@
 <?php
+
 namespace GCWorld\Database\Utilities;
 
 use Exception;
@@ -8,11 +9,19 @@ use PDOException;
 
 /**
  * TableSync Class.
+ *
+ * @phpstan-type ColumnDefinition array<string, mixed>
+ * @phpstan-type IndexDefinition array<string, mixed>
  */
 class TableSync
 {
-    protected array $alterations  = [];
+    /** @var list<string> */
+    protected array $alterations = [];
+
+    /** @var array<string, mixed> */
     protected array $sourceSchema = [];
+
+    /** @var array<string, mixed> */
     protected array $targetSchema = [];
 
     /**
@@ -37,18 +46,18 @@ class TableSync
     /**
      * @param bool $dryRun If true, will only generate SQL without executing it
      *
-     * @return array Result information including SQL statements and execution status
+     * @return array<string, mixed> Result information including SQL statements and execution status
      */
     public function synchronize(bool $dryRun = true): array
     {
         if (!$this->targetDB->tableExists($this->targetTable)) {
-            $sql = 'SHOW CREATE TABLE `'.$this->sourceTable.'`';
+            $sql = 'SHOW CREATE TABLE `' . $this->sourceTable . '`';
             $qry = $this->sourceDB->prepare($sql);
             $qry->execute();
             $row = $qry->fetch();
             $qry->closeCursor();
             $create = $row['Create Table'];
-            $create = \str_replace('`'.$this->sourceTable.'`', '`'.$this->targetTable.'`', $create);
+            $create = \str_replace('`' . $this->sourceTable . '`', '`' . $this->targetTable . '`', $create);
 
             if (!$dryRun) {
                 $this->targetDB->exec($create);
@@ -79,7 +88,7 @@ class TableSync
             return $result;
         }
 
-        $result['sql'] = "ALTER TABLE `{$this->targetTable}` ".\implode(', ', $this->alterations);
+        $result['sql'] = "ALTER TABLE `{$this->targetTable}` " . \implode(', ', $this->alterations);
 
         if (!$dryRun) {
             try {
@@ -87,7 +96,7 @@ class TableSync
                 $result['executed'] = true;
                 $result['message']  = 'Schema synchronization completed successfully.';
             } catch (PDOException $e) {
-                $result['message'] = 'Error during schema synchronization: '.$e->getMessage();
+                $result['message'] = 'Error during schema synchronization: ' . $e->getMessage();
             }
         } else {
             $result['message'] = 'Dry run completed. SQL statement generated but not executed.';
@@ -111,7 +120,7 @@ class TableSync
      * @param Database $cDB
      * @param string   $tableName
      *
-     * @return array Schema information
+     * @return array<string, mixed> Schema information
      */
     protected function getTableSchema(Database $cDB, string $tableName): array
     {
@@ -181,8 +190,8 @@ class TableSync
     }
 
     /**
-     * @param array $sourceColumn
-     * @param array $targetColumn
+     * @param ColumnDefinition $sourceColumn
+     * @param ColumnDefinition $targetColumn
      *
      * @return bool True if modification is needed
      */
@@ -199,7 +208,7 @@ class TableSync
      * Generate SQL for adding a column.
      *
      * @param string $columnName Column name
-     * @param array  $columnDef  Column definition
+     * @param ColumnDefinition $columnDef Column definition
      *
      * @return string SQL statement
      */
@@ -226,7 +235,7 @@ class TableSync
 
     /**
      * @param string $columnName Column name
-     * @param array  $columnDef  Column definition
+     * @param ColumnDefinition $columnDef Column definition
      *
      * @return string SQL statement
      */
@@ -239,7 +248,7 @@ class TableSync
 
     /**
      * @param string $columnName Column name
-     * @param array  $columnDef  Column definition
+     * @param ColumnDefinition $columnDef Column definition
      *
      * @return string SQL statement
      */
@@ -254,7 +263,7 @@ class TableSync
         }
 
         if (null !== $columnDef['Default']) {
-            $sql .= ' DEFAULT '.('CURRENT_TIMESTAMP' === $columnDef['Default'] ?
+            $sql .= ' DEFAULT ' . ('CURRENT_TIMESTAMP' === $columnDef['Default'] ?
                     'CURRENT_TIMESTAMP' :
                     "'{$columnDef['Default']}'");
         }
@@ -286,8 +295,10 @@ class TableSync
                 continue; // Handle primary keys separately
             }
 
-            if (!isset($sourceIndexGroups[$indexName])
-                || !$this->compareIndexDefinitions($sourceIndexGroups[$indexName], $indexGroup)) {
+            if (
+                !isset($sourceIndexGroups[$indexName])
+                || !$this->compareIndexDefinitions($sourceIndexGroups[$indexName], $indexGroup)
+            ) {
                 $this->alterations[] = "DROP INDEX `{$indexName}`";
             }
         }
@@ -298,8 +309,10 @@ class TableSync
                 continue; // Handle primary keys separately
             }
 
-            if (!isset($targetIndexGroups[$indexName])
-                || !$this->compareIndexDefinitions($indexGroup, $targetIndexGroups[$indexName])) {
+            if (
+                !isset($targetIndexGroups[$indexName])
+                || !$this->compareIndexDefinitions($indexGroup, $targetIndexGroups[$indexName])
+            ) {
                 $this->alterations[] = $this->generateAddIndexSQL($indexName, $indexGroup);
             }
         }
@@ -324,8 +337,8 @@ class TableSync
     /**
      * Compare two index definitions.
      *
-     * @param array $index1 First index definition
-     * @param array $index2 Second index definition
+     * @param list<IndexDefinition> $index1 First index definition
+     * @param list<IndexDefinition> $index2 Second index definition
      *
      * @return bool True if indexes are identical
      */
@@ -336,9 +349,11 @@ class TableSync
         }
 
         for ($i = 0; $i < \count($index1); ++$i) {
-            if ($index1[$i]['Column_name'] !== $index2[$i]['Column_name']
+            if (
+                $index1[$i]['Column_name'] !== $index2[$i]['Column_name']
                 || $index1[$i]['Sub_part'] !== $index2[$i]['Sub_part']
-                || $index1[$i]['Non_unique'] !== $index2[$i]['Non_unique']) {
+                || $index1[$i]['Non_unique'] !== $index2[$i]['Non_unique']
+            ) {
                 return false;
             }
         }
@@ -350,7 +365,7 @@ class TableSync
      * Generate SQL for adding an index.
      *
      * @param string $indexName  Index name
-     * @param array  $indexGroup Index definition
+     * @param list<IndexDefinition> $indexGroup Index definition
      *
      * @return string SQL statement
      */
@@ -367,7 +382,7 @@ class TableSync
             $length         = !empty($index['Sub_part']) ? "({$index['Sub_part']})" : '';
             $indexColumns[] = "`{$index['Column_name']}`{$length}";
         }
-        $indexDef .= \implode(', ', $indexColumns).')';
+        $indexDef .= \implode(', ', $indexColumns) . ')';
 
         return "ADD {$indexDef}";
     }
@@ -375,7 +390,7 @@ class TableSync
     /**
      * Generate SQL for adding a primary key.
      *
-     * @param array $primaryKey Primary key definition
+     * @param list<IndexDefinition> $primaryKey Primary key definition
      *
      * @return string SQL statement
      */
@@ -386,6 +401,6 @@ class TableSync
             $pkColumns[] = "`{$index['Column_name']}`";
         }
 
-        return 'ADD PRIMARY KEY ('.\implode(', ', $pkColumns).')';
+        return 'ADD PRIMARY KEY (' . \implode(', ', $pkColumns) . ')';
     }
 }

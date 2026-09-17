@@ -1,4 +1,5 @@
 <?php
+
 namespace GCWorld\Database;
 
 use Exception;
@@ -33,24 +34,26 @@ class Database extends PDO implements DatabaseInterface
         'Connection reset by peer'
     ];
 
-    protected array $connection_details   = [];
-    protected int   $deadlock_retries     = 0;
-    protected int   $deadlock_retries_max = 10;
-    protected int   $deadlock_usleep      = 1000;
-    protected int   $general_retries      = 0;
-    protected int   $general_retries_max  = 10;
-    protected int   $connect_retries      = 0;
-    protected int   $connect_retries_max  = 10;
-    protected int   $debugLevel           = 0;
-    protected array $debugTiming          = [];
-    protected bool  $trackPath            = false;
+    /** @var array<string, mixed> */
+    protected array $connection_details = [];
+    protected int $deadlock_retries     = 0;
+    protected int $deadlock_retries_max = 10;
+    protected int $deadlock_usleep      = 1000;
+    protected int $general_retries      = 0;
+    protected int $general_retries_max  = 10;
+    protected int $connect_retries      = 0;
+    protected int $connect_retries_max  = 10;
+    protected int $debugLevel           = 0;
+    /** @var array<string, array{query: string, times: list<array{params: mixed, time: float}>}> */
+    protected array $debugTiming = [];
+    protected bool $trackPath            = false;
     protected DatabasePool $pool;
 
     /**
      * @param string            $dsn
      * @param string|null       $username
      * @param string|null       $password
-     * @param array|null        $options
+     * @param array<int, mixed>|null $options
      * @param DatabasePool|null $pool
      */
     public function __construct(
@@ -65,8 +68,8 @@ class Database extends PDO implements DatabaseInterface
         $this->connection_details['password'] = $password;
         $this->connection_details['options']  = $options;
 
-        if($pool === null) {
-            $pool = new DatabasePool($dsn,$username,$password,$options);
+        if ($pool === null) {
+            $pool = new DatabasePool($dsn, $username, $password, $options);
         }
         $this->pool = $pool;
 
@@ -81,7 +84,7 @@ class Database extends PDO implements DatabaseInterface
      * @param string $dsn
      * @param string|null $username
      * @param string|null $password
-     * @param array|null $options
+     * @param array<int, mixed>|null $options
      * @return void
      * @throws Exception
      */
@@ -91,13 +94,13 @@ class Database extends PDO implements DatabaseInterface
             parent::__construct($dsn, $username, $password, $options);
             $this->connect_retries = 0;
         } catch (Exception $e) {
-            if($this->connect_retries >= $this->connect_retries_max) {
+            if ($this->connect_retries >= $this->connect_retries_max) {
                 throw $e;
             }
 
             $msg = $e->getMessage();
-            foreach(self::RECONNECT_STRINGS as $string) {
-                if(stripos($msg,$string)!==false) {
+            foreach (self::RECONNECT_STRINGS as $string) {
+                if (stripos($msg, $string) !== false) {
                     ++$this->connect_retries;
                     usleep(250);
                     $this->doConnect($dsn, $username, $password, $options);
@@ -127,8 +130,8 @@ class Database extends PDO implements DatabaseInterface
      */
     public function tableExists(string $table): bool
     {
-        $tmp  = explode('.',$table);
-        if(count($tmp) == 2) {
+        $tmp  = explode('.', $table);
+        if (count($tmp) == 2) {
             $db = $tmp[0];
             $table = $tmp[1];
         } else {
@@ -170,16 +173,16 @@ class Database extends PDO implements DatabaseInterface
      */
     public function getTableComment(string $table, ?string $schema = null): bool|string
     {
-        if(str_contains($table, '.')){
-            $tmp = explode('.',$table);
+        if (str_contains($table, '.')) {
+            $tmp = explode('.', $table);
             $table = $tmp[1];
             $schema = $tmp[0];
         }
-        if($schema == null) {
+        if ($schema == null) {
             $schema = $this->getWorkingDatabaseName();
         }
 
-        $sql= 'SELECT TABLE_COMMENT AS comment
+        $sql = 'SELECT TABLE_COMMENT AS comment
                FROM information_schema.TABLES
                WHERE TABLE_NAME = :table
                AND TABLE_SCHEMA = :schema';
@@ -206,7 +209,7 @@ class Database extends PDO implements DatabaseInterface
     public function setTableComment(string $table, string $comment): static
     {
         // Apparently this cannot be prepared.  Straight exec.
-        $sql = 'ALTER TABLE '.$table.' COMMENT = '.$this->quote($comment);
+        $sql = 'ALTER TABLE ' . $table . ' COMMENT = ' . $this->quote($comment);
         $this->exec($sql);
 
         return $this;
@@ -227,23 +230,23 @@ class Database extends PDO implements DatabaseInterface
 
     /**
      * @param string $query
-     * @param ?array $options
+     * @param array<int, mixed>|null $options
      * @return DatabaseStatement|false
      * @throws Exception
      */
-    public function prepare(string $query, ?array $options  = null): DatabaseStatement|false
+    public function prepare(string $query, ?array $options = null): DatabaseStatement|false
     {
-        if($this->trackPath) {
+        if ($this->trackPath) {
             $trace = debug_backtrace();
-            if(count($trace) > 1) {
+            if (count($trace) > 1) {
                 $last = $trace[0];
                 // @phpstan-ignore-next-line
-                if(str_ends_with($last['file'], 'Database.php')) {
+                if (str_ends_with($last['file'], 'Database.php')) {
                     $last = $trace[1];
                 }
-                $msg = 'F: '.$last['file'].' | L: '.$last['line'];
-                $msg = '/*!999999 '.$msg.' */ ';
-                $query = $msg.$query;
+                $msg = 'F: ' . $last['file'] . ' | L: ' . $last['line'];
+                $msg = '/*!999999 ' . $msg . ' */ ';
+                $query = $msg . $query;
             }
         }
 
@@ -253,13 +256,14 @@ class Database extends PDO implements DatabaseInterface
 
         try {
             /** @var DatabaseStatement $return */
-            $return = parent::prepare($query, $options );
+            $return = parent::prepare($query, $options);
             $this->general_retries  = 0;
             $this->deadlock_retries = 0;
             return $return;
         } catch (Exception $e) {
             $msg = $e->getMessage();
-            if($this->general_retries >= $this->general_retries_max
+            if (
+                $this->general_retries >= $this->general_retries_max
                 || $this->deadlock_retries >= $this->deadlock_retries_max
             ) {
                 throw $e;
@@ -267,21 +271,20 @@ class Database extends PDO implements DatabaseInterface
             if (stripos($msg, 'deadlock') !== false) {
                 ++$this->deadlock_retries;
                 usleep($this->deadlock_usleep);
-                return $this->prepare($query, $options );
+                return $this->prepare($query, $options);
             }
-            foreach(self::RECONNECT_STRINGS as $string) {
-                if(stripos($msg,$string)!==false) {
+            foreach (self::RECONNECT_STRINGS as $string) {
+                if (stripos($msg, $string) !== false) {
                     ++$this->general_retries;
                     usleep(250);
                     $this->reconnect();
                     usleep(250);
 
-                    return $this->prepare($query, $options );
+                    return $this->prepare($query, $options);
                 }
             }
             throw $e;
         }
-
     }
 
     /**
@@ -370,7 +373,7 @@ class Database extends PDO implements DatabaseInterface
     }
 
     /**
-     * @return array
+     * @return array<string, array{query: string, times: list<array{params: mixed, time: float}>}>
      */
     public function getDebugTiming(): array
     {
@@ -404,7 +407,7 @@ class Database extends PDO implements DatabaseInterface
      */
     public function disconnect(): bool
     {
-        $query = 'SHOW PROCESSLIST -- '.uniqid('pdo_mysql_close ', true);
+        $query = 'SHOW PROCESSLIST -- ' . uniqid('pdo_mysql_close ', true);
         try {
             $list = $this->query($query)->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\PDOException) {
@@ -413,7 +416,7 @@ class Database extends PDO implements DatabaseInterface
         foreach ($list as $thread) {
             if ($thread['Info'] === $query) {
                 try {
-                    $this->query('KILL '.$thread['Id']);
+                    $this->query('KILL ' . $thread['Id']);
                 } catch (\PDOException) {
                     return false;
                 }

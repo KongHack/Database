@@ -1,14 +1,16 @@
 <?xml version="1.0"?>
-<ruleset name="GCWorld_CodeSniffer_Config">
-    <description>GCWorld PHPCS Config</description>
+<ruleset name="Database">
+    <description>Database coding standard.</description>
 
-    <file>src/</file>
-    <exclude-pattern>*/Generated/*</exclude-pattern>
-
-    <arg name="encoding" value="UTF-8"/>
+    <arg name="colors"/>
     <arg name="extensions" value="php"/>
-    <arg value="s"/>
+    <arg name="parallel" value="8"/>
+    <arg name="warning-severity" value="0"/>
 
-    <rule ref="vendor/gcworld/code_sniffer_contrib/CodeSnifferContrib/"/>
+    <file>src</file>
+    <file>tests</file>
 
+    <exclude-pattern>src/Generated/*</exclude-pattern>
+
+    <rule ref="PSR12"/>
 </ruleset>
