@@ -4,10 +4,46 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/KongHack/Database/commits/master)
 
-- @GameCharmer Add PHP 8.4/8.5 GitHub Actions quality checks and tag-driven release automation.
-- @GameCharmer Add weekly Dependabot checks for Composer and GitHub Actions.
-- @GameCharmer Replace the legacy custom coding standard with PSR-12 and add a unified Composer quality suite.
-- @GameCharmer Add PHPUnit characterization coverage for the query builder.
+### Added
+
+- Added distinct selection, `HAVING`, explicit replace/append methods, stricter
+  parameter handling, and validated pagination to the select query builder.
+- Added idempotent `INNER` and `LEFT` joins identified by alias, or by table
+  when unaliased, with read-only join inspection for composable filters.
+- Added grouped `WHERE` and `HAVING` predicates through nested
+  `PredicateGroup` callbacks.
+- Added PHPUnit coverage for query composition, join identity and conflicts,
+  predicate grouping, parameter handling, validation, and pagination.
+- Added PHP 8.4/8.5 GitHub Actions quality checks, tag-driven GitHub Release
+  creation, and weekly Dependabot checks for Composer and GitHub Actions.
+- Added unified Composer scripts for syntax checks, PHPStan, PHPCS, PHPUnit,
+  and the complete quality suite.
+
+### Changed
+
+- **Breaking:** Reworked query-builder joins around alias/table identity and
+  removed the explicit join-key argument.
+- **Breaking:** Defined replacement semantics for `select()`, `where()`,
+  `having()`, `groupBy()`, and `orderBy()`; the corresponding `add*`, `and*`,
+  and `or*` methods append to existing clauses.
+- Preserved developer-authored SQL fragments as trusted input while validating
+  structural values and named parameter identifiers.
+- Wrapped rendered JOIN table references and `ON` conditions in parentheses to
+  make traced queries easier to read.
+- Replaced the legacy custom coding standard with PSR-12 and PHPStan level 6.
+
+### Removed
+
+- Removed the obsolete `gcworld/code_sniffer_contrib`, PHPMD, and PHPStan
+  deprecation-rule development dependencies and configuration.
+
+### Fixed
+
+- Rejected standalone `OFFSET` clauses that would be invalid in MySQL/MariaDB.
+- Rejected conflicting join and parameter declarations instead of silently
+  generating ambiguous query state.
+- Corrected the Docker Compose home and credential-mount paths for this
+  package.
 
 
 

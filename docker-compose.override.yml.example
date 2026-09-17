@@ -3,9 +3,9 @@ services:
     volumes:
       - type: bind
         source: '${HOME}/.config/composer/auth.json'
-        target: '/tmp/formconfig-home/.composer/auth.json'
+        target: '/tmp/database-home/.composer/auth.json'
         read_only: true
       - type: bind
         source: '${HOME}/.ssh'
-        target: '/tmp/formconfig-home/.ssh'
+        target: '/tmp/database-home/.ssh'
         read_only: true

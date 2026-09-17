@@ -2,60 +2,57 @@
 
 namespace GCWorld\Database\Query;
 
+use GCWorld\Database\Query\Exception\QueryBuilderException;
+
 /**
- * Join Final Class
+ * Immutable JOIN definition.
  */
 final readonly class Join
 {
+    private const SUPPORTED_TYPES = [
+        'INNER',
+        'LEFT',
+    ];
+
     public string $type;
     public string $table;
     public ?string $alias;
     public string $on;
-    public ?string $key;
 
-    /**
-     * @param string $type
-     * @param string $table
-     * @param string|null $alias
-     * @param string $on
-     * @param string|null $key
-     */
-    public function __construct(
-        string $type,
-        string $table,
-        ?string $alias,
-        string $on,
-        ?string $key = null
-    ) {
+    public function __construct(string $type, string $table, ?string $alias, string $on)
+    {
+        $type  = strtoupper(trim($type));
         $table = trim($table);
         $alias = $alias !== null ? trim($alias) : null;
-        $on    = self::normalizeSqlFragment($on);
-        $key   = $key !== null ? trim($key) : null;
+        $on    = trim($on);
 
-        $this->type  = strtoupper(trim($type));
+        if (!in_array($type, self::SUPPORTED_TYPES, true)) {
+            throw new QueryBuilderException('Unsupported JOIN type "' . $type . '"');
+        }
+        if ($table === '') {
+            throw new QueryBuilderException('JOIN table cannot be empty');
+        }
+        if ($alias === '') {
+            throw new QueryBuilderException('JOIN alias cannot be empty');
+        }
+        if ($on === '') {
+            throw new QueryBuilderException('JOIN condition cannot be empty');
+        }
+
+        $this->type  = $type;
         $this->table = $table;
-        $this->alias = $alias !== '' ? $alias : null;
+        $this->alias = $alias;
         $this->on    = $on;
-        $this->key   = $key !== '' ? $key : null;
     }
 
     /**
-     * @return string
+     * A join is addressed by its alias, falling back to its table expression.
      */
-    public function signature(): string
+    public function identity(): string
     {
-        return implode('|', [
-            $this->type,
-            $this->table,
-            $this->alias ?? '',
-            $this->on,
-        ]);
+        return $this->alias ?? $this->table;
     }
 
-    /**
-     * @param Join $other
-     * @return bool
-     */
     public function sameDefinition(self $other): bool
     {
         return $this->type === $other->type
@@ -64,25 +61,13 @@ final readonly class Join
             && $this->on === $other->on;
     }
 
-    /**
-     * @return string
-     */
     public function render(): string
     {
-        $sql = $this->type . ' JOIN ' . $this->table;
+        $table = $this->table;
         if ($this->alias !== null) {
-            $sql .= ' ' . $this->alias;
+            $table .= ' ' . $this->alias;
         }
 
-        return $sql . ' ON ' . $this->on;
-    }
-
-    /**
-     * @param string $sql
-     * @return string
-     */
-    protected static function normalizeSqlFragment(string $sql): string
-    {
-        return preg_replace('/\s+/', ' ', trim($sql)) ?? trim($sql);
+        return $this->type . ' JOIN (' . $table . ') ON (' . $this->on . ')';
     }
 }
