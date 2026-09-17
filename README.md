@@ -1,5 +1,12 @@
 # GCWorld Database
 
+![Packagist](https://img.shields.io/packagist/dm/gcworld/database.svg)
+![Packagist](https://img.shields.io/packagist/dt/gcworld/database.svg)
+
+![Packagist PHP](https://img.shields.io/packagist/php-v/gcworld/database.svg)
+![Packagist](https://img.shields.io/packagist/v/gcworld/database.svg)
+![GitHub](https://img.shields.io/github/tag/konghack/database.svg)
+
 GCWorld Database is a MySQL/MariaDB data-access library built on PDO. It adds
 connection defaults, retry and reconnect behavior, prepared-statement
 failover, lightweight connection pooling, schema synchronization, and a

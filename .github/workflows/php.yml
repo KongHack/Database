@@ -112,3 +112,11 @@ jobs:
             --verify-tag \
             --title "$GITHUB_REF_NAME" \
             --notes-file "$RUNNER_TEMP/release-notes.md"
+
+  refresh-site:
+    name: Refresh KongHack website
+    if: github.ref_type == 'tag'
+    needs: release
+    uses: KongHack/.github/.github/workflows/refresh-site.yml@main
+    secrets:
+      pages_dispatch_token: ${{ secrets.KONGHACK_PAGES_TOKEN }}
