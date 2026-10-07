@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
+## [2.8.1](https://github.com/KongHack/Database/releases/tag/2.8.1)
+- Update dependencies for new interface
+
+
+
 ## [2.8.0](https://github.com/KongHack/Database/releases/tag/2.8.0)
 
 ### Added

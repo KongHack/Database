@@ -17,7 +17,7 @@ values belong in prepared-statement parameters and must never be interpolated
 into SQL fragments.
 
 ### Version
-2.8.0
+2.8.1
 
 ## Requirements
 
